@@ -1,0 +1,13 @@
+
+INCLUDES =	-I$(top_srcdir) \
+			-DPREFIX=\""${prefix}\"" \
+			-DDATADIR=\""${pkgdatadir}"\" \
+			-DSYSCONFDIR=\""${sysconfdir}/${PACKAGE}"\" \
+			-DLIBDIR=\""${libdir}/${PACKAGE}"\" \
+			$(CURSESTOOLKIT_CFLAGS) \
+			$(CURSESTOOLKIT_CXXFLAGS)
+
+LIBS =		$(CURSESTOOLKIT_LIBS)
+
+
+
