@@ -17,37 +17,78 @@
  * You should have received a copy of the GNU General Public License
  * along with FBMediaPlayer.  If not, see <http://www.gnu.org/licenses/>.
  */
+ 
+#include <getopt.h>
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include "globals.h"
 
-#include <cursesGlobals.h>
+struct option long_options[] =
+	{
+		{"noimages",0,0,'n'},
+		{"version",0,0,'v'},
+		{"help",0,0,'?'},
+		{0, 0, 0, 0}
+	};
 
-#define VERSION "0.0.0"
-#define UNKNOWNARG -100
-
-enum {INFOAPPNAME=1,INFOAPPINFO,INFOCOPYRITE,INFOEMAIL,INFOWEBSITE,INFOCREDITS,INFOLICENCE,DIALOGWIDTH};
+void printHelp()
+{
+	printf("Usage: %s [OPTION] [TEXT]\n"
+		"Frame Buffer Media Player\n"
+		" -n, --noimages	Don't use images\n"
+		" -v, --version	output version information and exit\n"
+		" -h, -?, --help	print this help\n\n"
+		"Report bugs to keithdhedger@gmail.com\n"
+		,PACKAGE);
+}
 
 int main(int argc, char **argv)
 {
-	CTK_cursesUtilsClass	*cu;
-	CTK_mainAppClass		*mainApp;
-
-	if(argc<8)
+	while (1)
 		{
-			printf("USAGE:\naboutbox \"App name\" \"App info\" \"Copyright\" \"Email\" \"Website\" \"Credits\" \"Licence File\" Width.\n");
-			exit(1);
+			int	c;
+			int	option_index=0;
+			c=getopt_long(argc,argv,"v?hn",long_options,&option_index);
+			if(c==-1)
+				break;
+
+			switch (c)
+				{
+					case 'n':
+						useimages=false;
+						break;
+
+					case 'v':
+						printf("fbmediaplayer %s\n",VERSION);
+						return ALLOK;
+						break;
+
+					case '?':
+					case 'h':
+						printHelp();
+						return ALLOK;
+						break;
+
+					default:
+						fprintf(stderr,"?? Unknown argument ??\n");
+						return UNKNOWNARG;
+						break;
+				}
 		}
 
 	mainApp=new CTK_mainAppClass();
-	cu=new CTK_cursesUtilsClass();
+	fbInfo=mainApp->CTK_getFBData();
 
-	cu->CTK_aboutDialog(argv[INFOAPPNAME],argv[INFOAPPINFO],argv[INFOCOPYRITE],argv[INFOEMAIL],argv[INFOWEBSITE],argv[INFOCREDITS],argv[INFOLICENCE],atoi(argv[DIALOGWIDTH]));
+	fprintf(stderr,"cols=%i rows=%i fbwidth=%i fbhite=%i fbcharw=%i fbcharh=%i inatty=%i datadir=%s\n",mainApp->maxCols,mainApp->maxRows,fbInfo->screenWidth,fbInfo->screenHeight,fbInfo->charWidth,fbInfo->charHeight,isatty(fileno(stdout)),DATADIR);
+
+	SETHIDECURS;
+	makeMainPage();
+	mainApp->CTK_clearScreen();//TODO//
+	fflush(NULL);
+	mainApp->CTK_updateScreen(mainApp,NULL);//TODO//
+	mainApp->CTK_mainEventLoop(0,false,false);
 
 	SETSHOWCURS;
 	delete mainApp;
-	delete cu;
 	return(0);
 }
 

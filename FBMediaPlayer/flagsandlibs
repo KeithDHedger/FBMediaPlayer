@@ -1,13 +1,16 @@
 
-INCLUDES =	-I$(top_srcdir) \
+AM_CPPFLAGS =	-I$(top_srcdir) \
 			-DPREFIX=\""${prefix}\"" \
 			-DDATADIR=\""${pkgdatadir}"\" \
 			-DSYSCONFDIR=\""${sysconfdir}/${PACKAGE}"\" \
 			-DLIBDIR=\""${libdir}/${PACKAGE}"\" \
 			$(CURSESTOOLKIT_CFLAGS) \
-			$(CURSESTOOLKIT_CXXFLAGS)
+			$(CURSESTOOLKIT_CXXFLAGS) \
+			$(IMAGEMAGICK_CFLAGS) \
+			$(IMAGEMAGICK_CXXFLAGS)
 
-LIBS =		$(CURSESTOOLKIT_LIBS)
+LIBS =		$(CURSESTOOLKIT_LIBS) \
+			$(IMAGEMAGICK_LIBS)
 
 
 
