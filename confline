@@ -1,0 +1,38 @@
+#!/bin/bash -e
+
+if [ "X$1" == "Xfullconf" ];then
+	pushd ../LFSToolKit
+	./autogen.sh
+	sudo make distclean
+	CFLAGS="-g -O0" CXXFLAGS="-g -O0" ./configure --prefix=/usr --enable-debug
+	make -j4
+	exit 0
+fi
+
+if [ "X$1" == "Xconf" ];then
+	make distclean || true
+	rm -rf LFSPanel/src/.deps
+	LFSTK_CFLAGS="-I../../../LFSToolKit/LFSToolKit/lfstk" LDFLAGS="-L../../../LFSToolKit/LFSToolKit/app/.libs -llfstoolkit" CFLAGS="$LFSTK_CFLAGS -g -O0" CXXFLAGS="$LFSTK_CFLAGS -g -O0" ./autogen.sh --prefix=/usr --enable-debug --enable-notify
+else
+	if [ "X$1" = "Xmake" ];then
+		(cd ../LFSToolKit/;make -j4)
+			(
+				cd LFSPanel/app
+				make -j1 || exit 100
+			)
+		exit 0
+	fi
+
+	if [ "${USEVAL:-0}" -eq 1 ];then
+		USEVALGRIND="valgrind --leak-check=full"
+	fi
+
+	(cd ../LFSToolKit/;make -j4)
+	(
+		cd LFSPanel/app
+		make -j1
+	)
+	eval LD_LIBRARY_PATH=../LFSToolKit/LFSToolKit/app/.libs ${USEVALGRIND} LFSPanel/app/lfspanel $@
+fi
+
+exit 0
