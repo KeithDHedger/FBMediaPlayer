@@ -31,27 +31,31 @@ void makeMainPage(void)
 	if(useimages==true)
 		{
 			int gw=fbInfo->charWidth*3;
-			int gh=gw;
-			
+			int gh=gw/2;
+
 //main buttons
-			genx=mainApp->utils->CTK_getGadgetPosX(1,mainApp->maxCols,3,gw,0);
-			geny=mainApp->utils->CTK_getGadgetPosX(1,mainApp->maxRows,2,gh,0)+(gh/3);
-			img=mainApp->CTK_addNewFBImage(genx,geny,gw,gh,imagePaths[FILMIMAGE]);
+			//genx=mainApp->utils->CTK_getGadgetPosX(1,mainApp->maxCols,3,gw,0);
+			genx=mainApp->utils->CTK_getGadgetPos(1,mainApp->maxCols,3,gw,1);
+			geny=mainApp->utils->CTK_getGadgetPos(1,mainApp->maxRows,2,gh,1);
+			img=mainApp->CTK_addNewFBImage(genx,geny,gw,gw,imagePaths[FILMIMAGE]);
 			img->CTK_setSelectCB(buttonselectCB,(void*)1);
 
-			genx=mainApp->utils->CTK_getGadgetPosX(1,mainApp->maxCols,3,gw,1);
+//			genx=mainApp->utils->CTK_getGadgetPosX(1,mainApp->maxCols,3,gw,1);
+			genx=mainApp->utils->CTK_getGadgetPos(1,mainApp->maxCols,3,gw,2);
 			img=mainApp->CTK_addNewFBImage(genx,geny,gw,gw,imagePaths[TVIMAGE]);
-			img->CTK_setSelectCB(buttonselectCB,(void*)1);
-
-			genx=mainApp->utils->CTK_getGadgetPosX(1,mainApp->maxCols,3,gw,2);
-			img=mainApp->CTK_addNewFBImage(genx,geny,gw,gw,imagePaths[MUSICIMAGE]);
 			img->CTK_setSelectCB(buttonselectCB,(void*)2);
 
-//quit
-			genx=mainApp->utils->CTK_getGadgetPosX(1,mainApp->maxCols,1,gw,0);
-			geny=mainApp->utils->CTK_getGadgetPosX(1,mainApp->maxRows,2,gh,1)+(gh/3);
-			img=mainApp->CTK_addNewFBImage(genx,geny,gw,gw,imagePaths[OFFIMAGE]);
+//			genx=mainApp->utils->CTK_getGadgetPosX(1,mainApp->maxCols,3,gw,2);
+			genx=mainApp->utils->CTK_getGadgetPos(1,mainApp->maxCols,3,gw,3);
+			img=mainApp->CTK_addNewFBImage(genx,geny,gw,gw,imagePaths[MUSICIMAGE]);
 			img->CTK_setSelectCB(buttonselectCB,(void*)3);
+
+//quit
+			//genx=mainApp->utils->CTK_getGadgetPosX(1,mainApp->maxCols,1,gw,0);
+			genx=mainApp->utils->CTK_getGadgetPos(2,mainApp->maxCols,1,gw,1);
+			geny=mainApp->utils->CTK_getGadgetPos(1,mainApp->maxRows,2,gh,2);
+			img=mainApp->CTK_addNewFBImage(genx,geny,gw,gw,imagePaths[OFFIMAGE]);
+			img->CTK_setSelectCB(buttonselectCB,(void*)4);
 		}
 	else
 		{
@@ -71,12 +75,12 @@ void makeMainPage(void)
 			genx=mainApp->utils->CTK_getGadgetPosX(2,mainApp->maxCols-4,3,buttonwidth,2);
 			padstr=mainApp->utils->CTK_padString("Music",buttonwidth);
 			button=mainApp->CTK_addNewButton(genx,geny,buttonwidth,1,padstr.c_str());
-			button->CTK_setSelectCB(buttonselectCB,(void*)2);
+			button->CTK_setSelectCB(buttonselectCB,(void*)3);
 
 			genx=mainApp->utils->CTK_getGadgetPosX(2,mainApp->maxCols-4,1,buttonwidth,0);
 			geny=mainApp->utils->CTK_getGadgetPosX(1,mainApp->maxRows,2,1,1);
 			padstr=mainApp->utils->CTK_padString("Quit",buttonwidth);
 			button=mainApp->CTK_addNewButton(genx,geny,buttonwidth,1,padstr.c_str());
-			button->CTK_setSelectCB(buttonselectCB,(void*)3);
+			button->CTK_setSelectCB(buttonselectCB,(void*)4);
 		}
 }

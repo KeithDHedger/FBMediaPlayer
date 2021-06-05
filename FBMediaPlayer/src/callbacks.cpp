@@ -22,13 +22,14 @@
 
 bool buttonselectCB(void *inst,void *userdata)
 {
-	CTK_cursesButtonClass	*bc;
-if(useimages==true)
+	CTK_cursesGadgetClass	*bc;
+//if(useimages==true)
 	{
-		bc=static_cast<CTK_cursesButtonClass*>(inst);
+		bc=static_cast<CTK_cursesGadgetClass*>(inst);
 	}
-mainApp->runEventLoop=false;
-fprintf(stderr,"x=%i y=%i\n",bc->sx,bc->sy);
+if((long)userdata==4)
+	mainApp->runEventLoop=false;
+fprintf(stderr,"button=%i x=%i y=%i\n",(long)userdata,bc->sx,bc->sy);
 return(true);
 }
 
