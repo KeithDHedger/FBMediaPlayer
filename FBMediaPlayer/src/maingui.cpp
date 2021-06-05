@@ -45,6 +45,7 @@ void makeMainPage(void)
 			img=mainApp->CTK_addNewFBImage(genx,geny,gw,gw,imagePaths[TVIMAGE]);
 			img->CTK_setSelectCB(buttonselectCB,(void*)2);
 
+
 //			genx=mainApp->utils->CTK_getGadgetPosX(1,mainApp->maxCols,3,gw,2);
 			genx=mainApp->utils->CTK_getGadgetPos(1,mainApp->maxCols,3,gw,3);
 			img=mainApp->CTK_addNewFBImage(genx,geny,gw,gw,imagePaths[MUSICIMAGE]);
