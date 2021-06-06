@@ -23,7 +23,7 @@
 bool				useimages=true;
 
 const char			*infoStrings[]={"FBMediaPlayer","A media player for the linux framebuffer","Copyright (c) 2021 K.D.Hedger","keithdhedger@gmail.com","https://keithdhedger.github.io","K. D. Hedger","GPL 3.0"};
-const char			*imagePaths[]={DATADIR "/pixmaps/film.png",DATADIR "/pixmaps/tv.png",DATADIR "/pixmaps/music.png",DATADIR "/pixmaps/off.png",DATADIR "/pixmaps/settings.png"};
+const char			*imagePaths[]={DATADIR "/pixmaps/film.png",DATADIR "/pixmaps/tv.png",DATADIR "/pixmaps/music.png",DATADIR "/pixmaps/off.png",DATADIR "/pixmaps/settings.png",DATADIR "/pixmaps/home.png"};
 
 struct fbData		*fbInfo;
 

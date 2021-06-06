@@ -104,7 +104,7 @@ PROGRAMS = $(bin_PROGRAMS)
 am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_1 = ../src/callbacks.$(OBJEXT) ../src/globals.$(OBJEXT) \
 	../src/info.$(OBJEXT) ../src/main.$(OBJEXT) \
-	../src/maingui.$(OBJEXT)
+	../src/maingui.$(OBJEXT) ../src/moviesgui.$(OBJEXT)
 am_fbmediaplayer_OBJECTS = $(am__objects_1)
 fbmediaplayer_OBJECTS = $(am_fbmediaplayer_OBJECTS)
 fbmediaplayer_LDADD = $(LDADD)
@@ -153,7 +153,8 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ../src/$(DEPDIR)/callbacks.Po \
 	../src/$(DEPDIR)/globals.Po ../src/$(DEPDIR)/info.Po \
-	../src/$(DEPDIR)/main.Po ../src/$(DEPDIR)/maingui.Po
+	../src/$(DEPDIR)/main.Po ../src/$(DEPDIR)/maingui.Po \
+	../src/$(DEPDIR)/moviesgui.Po
 am__mv = mv -f
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -309,7 +310,7 @@ AM_CPPFLAGS = -I$(top_srcdir) \
 			$(CURSESTOOLKIT_CFLAGS) \
 			$(IMAGEMAGICK_CFLAGS)
 
-COMMONSRC = ../src/callbacks.cpp ../src/globals.cpp ../src/info.cpp ../src/main.cpp ../src/maingui.cpp
+COMMONSRC = ../src/callbacks.cpp ../src/globals.cpp ../src/info.cpp ../src/main.cpp ../src/maingui.cpp ../src/moviesgui.cpp
 fbmediaplayer_SOURCES = $(COMMONSRC)
 fbmediaplayer_CFLAGS = -O3
 scriptfilesdir = $(pkgdatadir)/scripts
@@ -407,6 +408,8 @@ clean-binPROGRAMS:
 	../src/$(DEPDIR)/$(am__dirstamp)
 ../src/maingui.$(OBJEXT): ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
+../src/moviesgui.$(OBJEXT): ../src/$(am__dirstamp) \
+	../src/$(DEPDIR)/$(am__dirstamp)
 
 fbmediaplayer$(EXEEXT): $(fbmediaplayer_OBJECTS) $(fbmediaplayer_DEPENDENCIES) $(EXTRA_fbmediaplayer_DEPENDENCIES) 
 	@rm -f fbmediaplayer$(EXEEXT)
@@ -459,6 +462,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/info.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/main.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/maingui.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/moviesgui.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -657,6 +661,7 @@ distclean: distclean-am
 	-rm -f ../src/$(DEPDIR)/info.Po
 	-rm -f ../src/$(DEPDIR)/main.Po
 	-rm -f ../src/$(DEPDIR)/maingui.Po
+	-rm -f ../src/$(DEPDIR)/moviesgui.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -707,6 +712,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ../src/$(DEPDIR)/info.Po
 	-rm -f ../src/$(DEPDIR)/main.Po
 	-rm -f ../src/$(DEPDIR)/maingui.Po
+	-rm -f ../src/$(DEPDIR)/moviesgui.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 

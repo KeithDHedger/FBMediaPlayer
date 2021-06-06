@@ -82,6 +82,10 @@ int main(int argc, char **argv)
 
 	SETHIDECURS;
 	makeMainPage();
+	makeMoviesPage();
+
+	mainApp->CTK_setPage(MAINPAGE);
+
 	mainApp->CTK_clearScreen();//TODO//
 	fflush(NULL);
 	mainApp->CTK_updateScreen(mainApp,NULL);//TODO//

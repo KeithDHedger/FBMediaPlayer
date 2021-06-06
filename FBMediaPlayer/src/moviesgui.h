@@ -1,8 +1,8 @@
 /*
  *
- * ©K. D. Hedger. Fri  4 Jun 11:44:03 BST 2021 keithdhedger@gmail.com
+ * ©K. D. Hedger. Sun  6 Jun 14:48:14 BST 2021 keithdhedger@gmail.com
 
- * This file (callbacks.cpp) is part of FBMediaPlayer.
+ * This file (moviesgui.h) is part of FBMediaPlayer.
 
  * FBMediaPlayer is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,30 +18,11 @@
  * along with FBMediaPlayer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "callbacks.h"
+#ifndef _MOVIESGUI_
+#define _MOVIESGUI_
 
-bool buttonselectCB(void *inst,void *userdata)
-{
-	CTK_cursesGadgetClass	*bc;
+#include "globals.h"
 
-	if(useimages==true)
-		{
-			bc=static_cast<CTK_cursesGadgetClass*>(inst);
-			fflush(NULL);
-		}
+void makeMoviesPage(void);
 
-	if((long)userdata==OFFIMAGE)
-		mainApp->runEventLoop=false;
-
-	if((long)userdata==FILMIMAGE)
-		mainApp->CTK_setPage(FILMPAGE);
-
-	if((long)userdata==HOMEIMAGE)
-		mainApp->CTK_setPage(MAINPAGE);
-
-	mainApp->CTK_updateScreen(mainApp,NULL);//TODO//
-
-	fprintf(stderr,"button=%i x=%i y=%i\n",(long)userdata,bc->sx,bc->sy);
-	return(true);
-}
-
+#endif
