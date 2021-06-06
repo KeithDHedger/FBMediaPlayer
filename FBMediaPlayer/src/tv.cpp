@@ -1,8 +1,8 @@
 /*
  *
- * ©K. D. Hedger. Sun  6 Jun 14:48:08 BST 2021 keithdhedger@gmail.com
+ * ©K. D. Hedger. Sun  6 Jun 18:20:33 BST 2021 keithdhedger@gmail.com
 
- * This file (moviesgui.cpp) is part of FBMediaPlayer.
+ * This file (tv.cpp) is part of FBMediaPlayer.
 
  * FBMediaPlayer is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,5 +49,4 @@ void makeTVPage(void)
 			button=mainApp->CTK_addNewButton(genx,geny,buttonwidth,1,padstr.c_str());
 			button->CTK_setSelectCB(buttonselectCB,(void*)HOMEIMAGE);
 		}
-
 }

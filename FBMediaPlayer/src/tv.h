@@ -1,8 +1,8 @@
 /*
  *
- * ©K. D. Hedger. Sun  6 Jun 14:48:14 BST 2021 keithdhedger@gmail.com
+ * ©K. D. Hedger. Sun  6 Jun 18:20:44 BST 2021 keithdhedger@gmail.com
 
- * This file (moviesgui.h) is part of FBMediaPlayer.
+ * This file (tv.h) is part of FBMediaPlayer.
 
  * FBMediaPlayer is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

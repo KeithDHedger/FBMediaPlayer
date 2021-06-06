@@ -49,5 +49,4 @@ void makeMoviesPage(void)
 			button=mainApp->CTK_addNewButton(genx,geny,buttonwidth,1,padstr.c_str());
 			button->CTK_setSelectCB(buttonselectCB,(void*)HOMEIMAGE);
 		}
-
 }
