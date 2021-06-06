@@ -18,8 +18,8 @@
  * along with FBMediaPlayer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _MOVIESGUI_
-#define _MOVIESGUI_
+#ifndef _MOVIES_
+#define _MOVIES_
 
 #include "globals.h"
 

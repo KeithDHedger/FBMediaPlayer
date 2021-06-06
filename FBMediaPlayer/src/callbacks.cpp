@@ -30,17 +30,29 @@ bool buttonselectCB(void *inst,void *userdata)
 			fflush(NULL);
 		}
 
-	if((long)userdata==OFFIMAGE)
-		mainApp->runEventLoop=false;
 
-	if((long)userdata==FILMIMAGE)
-		mainApp->CTK_setPage(FILMPAGE);
-
-	if((long)userdata==HOMEIMAGE)
-		mainApp->CTK_setPage(MAINPAGE);
-
+	switch((long)userdata)
+		{
+			case OFFIMAGE:
+				mainApp->runEventLoop=false;
+				break;
+			case HOMEIMAGE:
+				mainApp->CTK_setPage(MAINPAGE);
+				break;
+			case FILMIMAGE:
+				mainApp->CTK_setPage(FILMPAGE);
+				break;
+			case TVIMAGE:
+				mainApp->CTK_setPage(TVPAGE);
+				break;
+			case MUSICIMAGE:
+				mainApp->CTK_setPage(MUSICPAGE);
+				break;
+			case PREFSIMAGE:
+				mainApp->CTK_setPage(PREFSPAGE);
+				break;
+		}
 	mainApp->CTK_updateScreen(mainApp,NULL);//TODO//
-
 	fprintf(stderr,"button=%i x=%i y=%i\n",(long)userdata,bc->sx,bc->sy);
 	return(true);
 }

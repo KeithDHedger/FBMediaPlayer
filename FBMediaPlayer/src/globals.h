@@ -32,7 +32,10 @@
 #include "info.h"
 #include "maingui.h"
 #include "callbacks.h"
-#include "moviesgui.h"
+#include "movies.h"
+#include "tv.h"
+#include "music.h"
+#include "prefs.h"
 
 #define ALLOK 0
 #define UNKNOWNARG 1
@@ -41,8 +44,8 @@
 #define DATADIR "/media/LinuxData/Development64/Projects/FBMediaPlayer/FBMediaPlayer/resources"
 
 enum {INFOAPPNAME=0,INFOAPPINFO,INFOCOPYRITE,INFOEMAIL,INFOWEBSITE,INFOCREDITS,INFOLICENCE,DIALOGWIDTH};
-enum {FILMIMAGE=0,TVIMAGE,MUSICIMAGE,OFFIMAGE,SETTINGSIMAGE,HOMEIMAGE};
-enum {MAINPAGE=0,FILMPAGE};
+enum {FILMIMAGE=0,TVIMAGE,MUSICIMAGE,OFFIMAGE,PREFSIMAGE,HOMEIMAGE};
+enum {MAINPAGE=0,FILMPAGE,TVPAGE,MUSICPAGE,PREFSPAGE};
 
 extern bool					useimages;
 extern const char			*infoStrings[];

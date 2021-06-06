@@ -83,6 +83,9 @@ int main(int argc, char **argv)
 	SETHIDECURS;
 	makeMainPage();
 	makeMoviesPage();
+	makeTVPage();
+	makeMusicPage();
+	makePrefsPage();
 
 	mainApp->CTK_setPage(MAINPAGE);
 

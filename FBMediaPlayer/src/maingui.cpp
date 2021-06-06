@@ -51,8 +51,8 @@ void makeMainPage(void)
 //settings
 			geny=mainApp->utils->CTK_getGadgetPos(1,mainApp->maxRows,4,gh,4);
 			genx=mainApp->utils->CTK_getGadgetPos(1,mainApp->maxCols,2,gw,1);
-			img=mainApp->CTK_addNewFBImage(genx,geny,gw/2,gw,imagePaths[SETTINGSIMAGE]);
-			img->CTK_setSelectCB(buttonselectCB,(void*)SETTINGSIMAGE);
+			img=mainApp->CTK_addNewFBImage(genx,geny,gw/2,gw,imagePaths[PREFSIMAGE]);
+			img->CTK_setSelectCB(buttonselectCB,(void*)PREFSIMAGE);
 //quit
 			genx=mainApp->utils->CTK_getGadgetPos(1,mainApp->maxCols,2,gw,2);
 			img=mainApp->CTK_addNewFBImage(genx,geny,gw/2,gw,imagePaths[OFFIMAGE]);
@@ -86,7 +86,7 @@ void makeMainPage(void)
 			genx=mainApp->utils->CTK_getGadgetPos(0,mainApp->maxCols,2,buttonwidth,1);
 			padstr=mainApp->utils->CTK_padString("Settings",buttonwidth);
 			button=mainApp->CTK_addNewButton(genx,geny,buttonwidth,1,padstr.c_str());
-			button->CTK_setSelectCB(buttonselectCB,(void*)SETTINGSIMAGE);
+			button->CTK_setSelectCB(buttonselectCB,(void*)PREFSIMAGE);
 //quit
 			genx=mainApp->utils->CTK_getGadgetPos(0,mainApp->maxCols,2,buttonwidth,2);
 			padstr=mainApp->utils->CTK_padString("Quit",buttonwidth);

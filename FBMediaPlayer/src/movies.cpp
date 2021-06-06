@@ -18,7 +18,7 @@
  * along with FBMediaPlayer.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-#include "moviesgui.h"
+#include "movies.h"
 
 void makeMoviesPage(void)
 {
