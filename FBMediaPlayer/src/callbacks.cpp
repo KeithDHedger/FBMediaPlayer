@@ -27,7 +27,7 @@ bool buttonselectCB(void *inst,void *userdata)
 	{
 		bc=static_cast<CTK_cursesGadgetClass*>(inst);
 	}
-if((long)userdata==4)
+if((long)userdata==OFFIMAGE)
 	mainApp->runEventLoop=false;
 fprintf(stderr,"button=%i x=%i y=%i\n",(long)userdata,bc->sx,bc->sy);
 return(true);
