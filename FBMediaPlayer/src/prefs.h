@@ -23,6 +23,16 @@
 
 #include "globals.h"
 
+extern std::vector<varsStruct> filmPrefs;
+extern std::vector<varsStruct> tvPrefs;
+extern std::vector<varsStruct> musicPrefs;
+
+extern std::vector<varsStruct>	prefsData;
+extern std::string				prefsPath;
+
+//	char					*filepath="/tmp/testvar.config";
+//	const char				*vartype="";
+
 void makePrefsPage(void);
 
 #endif

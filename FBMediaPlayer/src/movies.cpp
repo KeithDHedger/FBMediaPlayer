@@ -32,11 +32,11 @@ void makeMoviesPage(void)
 	if(useimages==true)
 		{
 			int gw=mainApp->maxCols/8;
-			int gh=gw/(fbInfo->charHeight/fbInfo->charWidth);
+			int mult=fbInfo->charHeight/fbInfo->charWidth;
 			geny=mainApp->utils->CTK_getGadgetPosX(1,mainApp->maxRows,4,1,3);
 //home
 			genx=mainApp->utils->CTK_getGadgetPos(1,mainApp->maxCols,3,gw,2);
-			img=mainApp->CTK_addNewFBImage(genx,geny,gw/2,gw,imagePaths[HOMEIMAGE]);
+			img=mainApp->CTK_addNewFBImage(genx,geny,gw/mult,gw,imagePaths[HOMEIMAGE]);
 			img->CTK_setSelectCB(buttonselectCB,(void*)HOMEIMAGE);
 		}
 	else

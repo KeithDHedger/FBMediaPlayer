@@ -20,6 +20,13 @@
  
 #include "prefs.h"
 
+std::vector<varsStruct> filmPrefs={{"filmpath",CHARVAR,-1,false,-1,""}};
+std::vector<varsStruct> tvPrefs;
+std::vector<varsStruct> musicPrefs;
+
+std::vector<varsStruct>	prefsData={{"filmpath",CHARVAR,-1,false,-1,getenv("HOME") + std::string("/Videos")},{"tvpath",CHARVAR,-1,false,-1,getenv("HOME") + std::string("/Videos")},{"musicpath",CHARVAR,-1,false,-1,getenv("HOME") + std::string("/Music")}};
+std::string				prefsPath;
+
 void makePrefsPage(void)
 {
 	int						genx;
@@ -27,6 +34,24 @@ void makePrefsPage(void)
 	std::string				padstr;
 	CTK_cursesButtonClass	*button;
 	CTK_cursesFBImageClass	*img;
+	varsStruct				vsfilm;
+
+	prefsPath=getenv("HOME");
+	prefsPath+="/.FBMediaPlayer";
+	mkdir(prefsPath.c_str(),0700);
+	prefsPath+="/fbmediaplayerprefs.rc";
+
+	if(access(prefsPath.c_str(),F_OK)==0)
+		{
+			prefsData=mainApp->utils->CTK_loadVars(prefsPath.c_str());
+		}
+	else
+		{
+			mainApp->utils->CTK_saveVars(prefsPath.c_str(),prefsData);
+		}
+
+fprintf(stderr,"prefsPath=%s\n",prefsPath.c_str());
+mainApp->utils->CTK_saveVars("2",prefsData);
 
 	mainApp->CTK_addPage();
 	if(useimages==true)
