@@ -34,5 +34,6 @@ enum {START=1,PREVIOUS,PLAY,STOP,PAUSE,NEXT,END,QUIT};
 void getMeta(void);
 void makeMusicPage(void);
 void runMusic(void);
+void sendToPipe(const std::string command);
 
 #endif

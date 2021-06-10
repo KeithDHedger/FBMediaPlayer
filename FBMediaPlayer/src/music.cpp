@@ -21,7 +21,7 @@
 #include "music.h"
 
 LFSTK_findClass				*files=new LFSTK_findClass();;
-//CTK_cursesChooserClass		*playLists;
+CTK_cursesChooserClass		*playLists;
 CTK_cursesListBoxClass		*songList;
 CTK_cursesFBImageClass		*image;
 CTK_cursesFBImageClass		*albumArt;
@@ -44,9 +44,7 @@ bool						playing=false;
 bool						paused=false;
 char						*oldfile=NULL;
 bool						updated=false;
-std::string					outName="";
-std::string					fifoName="";
-char						commandString[PATH_MAX];
+bool						doQuitMusic=false;
 
 char* oneLiner(const char* fmt,...)
 {
@@ -105,12 +103,11 @@ char* oneLiner(const char* fmt,...)
 	return(NULL);
 }
 
-void sendToPipe(const char *command)
+void sendToPipe(const std::string command)
 {
-	char	buffer[PATH_MAX];
-
-	sprintf(buffer,"echo -e \"%s\" >\"%s\" &",command,fifoName.c_str());
-	system(buffer);
+	std::string	buffer="echo -e \"";
+	buffer+=command + "\" >\"" + fifoName + "\" &";
+	system(buffer.c_str());
 }
 
 void getMeta(void)
@@ -120,14 +117,14 @@ void getMeta(void)
 	char	*title;
 	char	*artist;
 	char	*all;
-	char	*command;
 	char	*jpeg;
 
 	if((playing==false) || (paused==true) || (doQuitMusic==true))
 		return;
 
-	sprintf(commandString,"get_property path\\nget_meta_album\\nget_meta_title\\nget_meta_artist");
+	commandString="get_property path\\nget_meta_album\\nget_meta_title\\nget_meta_artist";
 	sendToPipe(commandString);
+
 	filename=oneLiner("tail -n4 '%s' |sed -n '1p'|awk -F= '{print $2}'",outName.c_str());
 
 	if(strcmp(filename,"(null)")==0)
@@ -164,19 +161,20 @@ void getMeta(void)
 							free(album);
 							free(artist);
 							free(all);
-							sprintf(commandString,":>'%s'",outName.c_str());
-							system(commandString);
 
-							sprintf(commandString,"%s",filename);
-							asprintf(&jpeg,"%s/folder.jpg",dirname(commandString));
+							commandString=":>'";
+							commandString+=outName + "'";
+							system(commandString.c_str());
+							asprintf(&jpeg,"%s/folder.jpg",dirname(filename));
 							albumArt->CTK_newFBImage(chooserWidth+6,artSY,artHite*2,artHite,jpeg,false);
 							mainApp->CTK_updateScreen(mainApp,NULL);
 							free(jpeg);
 						}
 
 					free(filename);
-					sprintf(commandString,":>'%s'",outName.c_str());
-					system(commandString);
+					commandString=":>'";
+					commandString+=outName + "'";
+					system(commandString.c_str());
 					return;
 				}
 		}
@@ -190,18 +188,19 @@ void getMeta(void)
 
 bool selectSongCB(void *inst,void *userdata)
 {
-	char *command;
 	CTK_cursesListBoxClass	*sl=static_cast<CTK_cursesListBoxClass*>(inst);
 
 	if(sl->listItems.size()==0)
 		return(true);
 
-	sprintf(commandString,"p\\npausing_keep_force loadlist \\\"%s\\\"",playLists->filePath.c_str());
+	commandString="p\\npausing_keep_force loadlist \\\"";
+	commandString+=playLists->filePath + "\\\"";
 	sendToPipe(commandString);
 
 	if((long)sl->listItems[sl->listItemNumber]->userData!=0)
 		{
-			sprintf(commandString,"pausing_keep_force pt_step %i\\np",(long)sl->listItems[sl->listItemNumber]->userData);
+			commandString="pausing_keep_force pt_step ";
+			commandString+=std::to_string((long)sl->listItems[sl->listItemNumber]->userData) + "\\np";
 			sendToPipe(commandString);
 		}
 	else
@@ -214,16 +213,15 @@ bool selectSongCB(void *inst,void *userdata)
 
 bool controlsCB(void *inst,void *userdata)
 {
-	CTK_cursesFBImageClass	*bc=static_cast<CTK_cursesFBImageClass*>(inst);
-	long					ud=(long)userdata;
-	char					*command;
+	long	ud=(long)userdata;
 
 	switch(ud)
 		{
 			case START:
 				if(playing==false)
 					return(true);
-				sprintf(commandString,"loadlist \\\"%s\\\"",playLists->filePath.c_str());
+				commandString="loadlist \\\"";
+				commandString+=playLists->filePath + "\\\"";
 				sendToPipe(commandString);
 				playing=true;
 				paused=false;
@@ -273,9 +271,11 @@ bool controlsCB(void *inst,void *userdata)
 			case END:
 				if(playing==false)
 					return(true);
-				sprintf(commandString,"p\\npausing_keep_force loadlist \\\"%s\\\"",playLists->filePath.c_str());
+				commandString="p\\npausing_keep_force loadlist \\\"";
+				commandString+=playLists->filePath + "\\\"";
 				sendToPipe(commandString);
-				sprintf(commandString,"pausing_keep_force pt_step %i\\np",songs.size()-1);
+				commandString="pausing_keep_force pt_step ";
+				commandString+=std::to_string(songs.size()-1) + "\\np";
 				sendToPipe(commandString);
 				playing=true;
 				paused=false;
@@ -289,12 +289,19 @@ bool controlsCB(void *inst,void *userdata)
 				break;
 
 			case QUIT:
-				doQuitMusic=true;
-				playing=false;
-				paused=true;
-				sendToPipe("q");
 				for(int j=0;j<songs.size();j++)
 					free(songs[j]);
+				songs.clear();
+				songList->CTK_clearList();
+				sendToPipe("stop");
+				albumArt->CTK_newFBImage(chooserWidth+6,artSY,artHite*2,artHite,"",false);
+				nowPlaying->CTK_updateText("");
+				mainApp->CTK_setDefaultGadget(playLists->lb);
+				mainApp->CTK_clearScreen();
+				mainApp->CTK_updateScreen(mainApp,(void*)1);
+				playing=false;
+				paused=false;
+				doQuitMusic=true;
 				break;
 		}
 	return(true);
@@ -303,7 +310,6 @@ bool controlsCB(void *inst,void *userdata)
 bool playListsCB(void *inst,void *userdata)
 {
 	CTK_cursesChooserClass	*ch=static_cast<CTK_cursesChooserClass*>(inst);
-	long					ud=(long)userdata;
 	FILE					*fd=NULL;
 	char					buffer[PATH_MAX];
 	char					buffer2[PATH_MAX];
@@ -332,13 +338,14 @@ bool playListsCB(void *inst,void *userdata)
 				}
 			fclose(fd);
 		}
-	for(int j=0;j<songs.size();j++)
+	for(long j=0;j<songs.size();j++)
 		{
 			char	*ptr=strrchr(songs[j],'/');
 			songList->CTK_addListItem(++ptr,(void*)j);
 		}
 
-	sprintf(commandString,"loadlist '%s'",ch->filePath.c_str());
+	commandString="loadlist '";
+	commandString+=ch->filePath + "'";
 	sendToPipe(commandString);
 	playing=true;
 	return(true);
@@ -346,11 +353,9 @@ bool playListsCB(void *inst,void *userdata)
 
 void makeMusicPage(void)
 {
-	CTK_cursesButtonClass	*button;
 	char					imagepath[PATH_MAX];
 
 	mainApp->CTK_addPage();
-	//folder=musicPath->CTK_getText();
 	midWay=mainApp->maxCols/2;
 	dialogWidth=mainApp->maxCols-4;
 	chooserWidth=((mainApp->maxCols/8)*5)-2;
@@ -362,12 +367,14 @@ void makeMusicPage(void)
 	artHite=songsHite;
 	fifoName="/tmp/mplayerfifo" + std::to_string(getpid());
 	outName="/tmp/mplayerout" + std::to_string(getpid());
-	sprintf(commandString,"mkfifo '%s'",fifoName.c_str());
-	system(commandString);
+	commandString="mkfifo '";
+	commandString+=fifoName + "'";
+	system(commandString.c_str());
 
 //start mplayer
-	sprintf(commandString,"mplayer -quiet -slave -input file='%s' -idle >'%s' 2>/dev/null &",fifoName.c_str(),outName.c_str());
-	system(commandString);
+	commandString="";
+	commandString+="mplayer -quiet -slave -input file='" + fifoName + "' -idle >'" + outName + "' 2>/dev/null &";
+	system(commandString.c_str());
 
 	mainApp->colours.fancyGadgets=true;
 	mainApp->colours.boxType=NOBOX;
@@ -376,7 +383,6 @@ void makeMusicPage(void)
 	mainApp->colours.backCol=BACK_WHITE;
 	mainApp->colours.foreCol=FORE_BLACK;
 	playLists=new CTK_cursesChooserClass(mainApp,3,2,chooserWidth,chooserHite);
-	//playLists->CTK_selectFolder(mainApp,"/media/Music/Flacs/Playlists");
 	playLists->CTK_setShowFileTypes(".m3u;");
 	playLists->CTK_setShowTypes(ANYTYPE);
 	playLists->CTK_setShowHidden(false);
@@ -386,7 +392,7 @@ void makeMusicPage(void)
 
 	songList=mainApp->CTK_addNewListBox(chooserWidth+6,2,songsWidth,songsHite);
 	songList->CTK_setSelectCB(selectSongCB,NULL);
-#if 1
+
 	nowPlaying=mainApp->CTK_addNewTextBox(3,chooserHite+4,chooserWidth,3,"");
 	nowPlaying->CTK_setSelectable(false);
 
@@ -411,14 +417,13 @@ void makeMusicPage(void)
 	sprintf(imagepath,"%s/MusicPlayer/end.png",resources.c_str());
 	image=mainApp->CTK_addNewFBImage(mainApp->utils->CTK_getGadgetPosX(midWay-(dialogWidth/2),dialogWidth,CONTROLCNT,4,6),controlsSY,4,4,imagepath);
 	image->CTK_setSelectCB(controlsCB,(void*)END);
-#endif
+
 	sprintf(imagepath,"%s/MusicPlayer/quit.png",resources.c_str());
 	image=mainApp->CTK_addNewFBImage(mainApp->utils->CTK_getGadgetPosX(midWay-(dialogWidth/2),dialogWidth,CONTROLCNT,4,7),controlsSY,4,4,imagepath);
 	image->CTK_setSelectCB(controlsCB,(void*)QUIT);
-#if 1
+
 	albumArt=mainApp->CTK_addNewFBImage(chooserWidth+6,artSY,artHite,artHite,NULL,false);
 	albumArt->CTK_setSelectable(false);
-#endif
 }
 
 void runMusic(void)

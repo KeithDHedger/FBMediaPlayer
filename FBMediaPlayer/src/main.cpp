@@ -96,8 +96,15 @@ int main(int argc, char **argv)
 	fflush(NULL);
 	mainApp->CTK_updateScreen(mainApp,NULL);//TODO//
 	mainApp->CTK_mainEventLoop(0,false,false);
+
+	sendToPipe("q");
+	commandString="";
+	commandString+="rm '" + fifoName + "' '" + outName + "'";
+	system(commandString.c_str());
+
 	SETSHOWCURS;
 	delete mainApp;
+
 	return(0);
 }
 

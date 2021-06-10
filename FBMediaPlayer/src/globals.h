@@ -48,13 +48,15 @@ enum {FILMIMAGE=0,TVIMAGE,MUSICIMAGE,OFFIMAGE,PREFSIMAGE,HOMEIMAGE,SAVEIMAGE,CAN
 enum {SETFILMPREFS=100,SETTVPREFS,SETMUSICPREFS};
 enum {MAINPAGE=0,FILMPAGE,TVPAGE,MUSICPAGE,PREFSPAGE};
 
-extern bool					useimages;
-extern const char			*infoStrings[];
-extern const char			*imagePaths[];
-extern struct fbData		*fbInfo;
-extern CTK_mainAppClass		*mainApp;
-extern CTK_cursesChooserClass		*playLists;
-extern bool	doQuitMusic;
+extern struct fbData			*fbInfo;
+extern const char				*infoStrings[];
+extern const char				*imagePaths[];
+extern bool						useimages;
+extern std::string				outName;
+extern std::string				fifoName;
+extern std::string				commandString;
+
+extern CTK_mainAppClass			*mainApp;
 #endif
 
 
