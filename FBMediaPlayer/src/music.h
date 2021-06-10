@@ -22,7 +22,17 @@
 #define _MUSIC_
 
 #include "globals.h"
+#include <libgen.h>
+#include <cursesGlobals.h>
+#include <stdarg.h>
+#include <getopt.h>
+#include "config.h"
 
+#define CONTROLCNT 8
+enum {START=1,PREVIOUS,PLAY,STOP,PAUSE,NEXT,END,QUIT};
+
+void getMeta(void);
 void makeMusicPage(void);
+void runMusic(void);
 
 #endif

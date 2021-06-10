@@ -1,0 +1,35 @@
+{
+	ignore_versioned_libscurs
+	Memcheck:Leak
+	...
+	obj:/lib64/libncursesw.so.*
+	...
+}
+{
+	ignore_versioned_libmagickcore
+	Memcheck:Leak
+	...
+	obj:/usr//lib64/libMagickCore.*
+	...
+}
+{
+	ignore_versioned_libmagick
+	Memcheck:Leak
+	...
+	obj:/usr/lib64/libMagick*
+	...
+}
+{
+	ignore_versioned_libmagickcore
+	Memcheck:Cond
+	...
+	obj:/usr//lib64/libMagickCore.*
+	...
+}
+{
+	ignore_versioned_libmagick
+	Memcheck:Cond
+	...
+	obj:/usr/lib64/libMagick*
+	...
+}

@@ -44,7 +44,8 @@
 #define DATADIR "/media/LinuxData/Development64/Projects/FBMediaPlayer/FBMediaPlayer/resources"
 
 enum {INFOAPPNAME=0,INFOAPPINFO,INFOCOPYRITE,INFOEMAIL,INFOWEBSITE,INFOCREDITS,INFOLICENCE,DIALOGWIDTH};
-enum {FILMIMAGE=0,TVIMAGE,MUSICIMAGE,OFFIMAGE,PREFSIMAGE,HOMEIMAGE};
+enum {FILMIMAGE=0,TVIMAGE,MUSICIMAGE,OFFIMAGE,PREFSIMAGE,HOMEIMAGE,SAVEIMAGE,CANCELIMAGE};
+enum {SETFILMPREFS=100,SETTVPREFS,SETMUSICPREFS};
 enum {MAINPAGE=0,FILMPAGE,TVPAGE,MUSICPAGE,PREFSPAGE};
 
 extern bool					useimages;
@@ -52,7 +53,8 @@ extern const char			*infoStrings[];
 extern const char			*imagePaths[];
 extern struct fbData		*fbInfo;
 extern CTK_mainAppClass		*mainApp;
-
+extern CTK_cursesChooserClass		*playLists;
+extern bool	doQuitMusic;
 #endif
 
 

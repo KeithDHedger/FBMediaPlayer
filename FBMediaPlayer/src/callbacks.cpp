@@ -20,16 +20,32 @@
 
 #include "callbacks.h"
 
+void setFromBoxPath(CTK_cursesInputClass *box,const char *varname)
+{
+	const char	*folder;
+
+	folder=box->CTK_getText();
+	if(access(folder,F_OK)!=0)
+		folder=getenv("HOME");
+	mainApp->utils->CTK_fileChooserDialog(folder,CUOPENFOLDER);
+	if(mainApp->utils->dialogReturnData.isValidData==true)
+		{ 
+			box->CTK_setText(mainApp->utils->dialogReturnData.stringValue.c_str());
+			prefsData.at(mainApp->utils->CTK_getVarEntry(prefsData,varname)).charVar=box->CTK_getText();
+			mainApp->utils->CTK_saveVars(prefsPath.c_str(),prefsData);
+		}
+}
+
 bool buttonselectCB(void *inst,void *userdata)
 {
-	CTK_cursesGadgetClass	*bc;
+	//CTK_cursesGadgetClass	*bc;
+	//const char	*folder;
 
-	if(useimages==true)
+	//if(useimages==true)
 		{
-			bc=static_cast<CTK_cursesGadgetClass*>(inst);
+			//bc=static_cast<CTK_cursesGadgetClass*>(inst);
 			fflush(NULL);
 		}
-
 
 	switch((long)userdata)
 		{
@@ -47,13 +63,35 @@ bool buttonselectCB(void *inst,void *userdata)
 				break;
 			case MUSICIMAGE:
 				mainApp->CTK_setPage(MUSICPAGE);
+				runMusic();
+				mainApp->CTK_setPage(MAINPAGE);
 				break;
 			case PREFSIMAGE:
 				mainApp->CTK_setPage(PREFSPAGE);
 				break;
+//prefs
+			case SETFILMPREFS:
+				setFromBoxPath(videoPath,"filmpath");
+				break;
+
+			case SETTVPREFS:
+				setFromBoxPath(tvPath,"tvpath");
+				break;
+
+			case SETMUSICPREFS:
+				setFromBoxPath(musicPath,"musicpath");
+				break;
+//save prefs
+			case SAVEIMAGE:
+				updatePrefs();
+				mainApp->CTK_setPage(MAINPAGE);
+				break;
+
+			default:
+				break;
 		}
 	mainApp->CTK_updateScreen(mainApp,NULL);//TODO//
-	fprintf(stderr,"button=%i x=%i y=%i\n",(long)userdata,bc->sx,bc->sy);
+	//fprintf(stderr,"button=%i x=%i y=%i\n",(long)userdata,bc->sx,bc->sy);
 	return(true);
 }
 

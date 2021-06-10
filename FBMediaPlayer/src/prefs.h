@@ -30,9 +30,11 @@ extern std::vector<varsStruct> musicPrefs;
 extern std::vector<varsStruct>	prefsData;
 extern std::string				prefsPath;
 
-//	char					*filepath="/tmp/testvar.config";
-//	const char				*vartype="";
+extern CTK_cursesInputClass		*videoPath;
+extern CTK_cursesInputClass		*tvPath;
+extern CTK_cursesInputClass		*musicPath;
 
+void updatePrefs(void);
 void makePrefsPage(void);
 
 #endif

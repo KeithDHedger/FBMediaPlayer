@@ -24,9 +24,9 @@ else
 	fi
 
 	if [ "${USEVAL:-0}" -eq 1 ];then
-		USEVALGRIND="valgrind --leak-check=full"
+		USEVALGRIND="valgrind --leak-check=full --suppressions=./ignorelibleaks -s"
 	fi
-
+ #--undef-value-errors=no
 	(cd ../CursesToolKit/;make -j4)
 	(
 		cd FBMediaPlayer/app
