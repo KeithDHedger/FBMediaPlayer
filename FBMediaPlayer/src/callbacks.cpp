@@ -41,7 +41,7 @@ bool buttonselectCB(void *inst,void *userdata)
 	//CTK_cursesGadgetClass	*bc;
 	//const char	*folder;
 
-	//if(useimages==true)
+	//if(useFBImages==true)
 		{
 			//bc=static_cast<CTK_cursesGadgetClass*>(inst);
 			fflush(NULL);

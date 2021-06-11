@@ -106,7 +106,7 @@ char* oneLiner(const char* fmt,...)
 void sendToPipe(const std::string command)
 {
 	std::string	buffer="echo -e \"";
-	buffer+=command + "\" >\"" + fifoName + "\" &";
+	buffer+=command + "\" >\"" + musicFifoName + "\" &";
 	system(buffer.c_str());
 }
 
@@ -365,15 +365,15 @@ void makeMusicPage(void)
 	songsHite=(chooserHite+4)/2;
 	artSY=songsHite+4;
 	artHite=songsHite;
-	fifoName="/tmp/mplayerfifo" + std::to_string(getpid());
+	musicFifoName="/tmp/mplayerfifo" + std::to_string(getpid());
 	outName="/tmp/mplayerout" + std::to_string(getpid());
 	commandString="mkfifo '";
-	commandString+=fifoName + "'";
+	commandString+=musicFifoName + "'";
 	system(commandString.c_str());
 
 //start mplayer
 	commandString="";
-	commandString+="mplayer -quiet -slave -input file='" + fifoName + "' -idle >'" + outName + "' 2>/dev/null &";
+	commandString+="mplayer -quiet -slave -input file='" + musicFifoName + "' -idle >'" + outName + "' 2>/dev/null &";
 	system(commandString.c_str());
 
 	mainApp->colours.fancyGadgets=true;
@@ -383,7 +383,7 @@ void makeMusicPage(void)
 	mainApp->colours.backCol=BACK_WHITE;
 	mainApp->colours.foreCol=FORE_BLACK;
 	playLists=new CTK_cursesChooserClass(mainApp,3,2,chooserWidth,chooserHite);
-	playLists->CTK_setShowFileTypes(".m3u;");
+	playLists->CTK_setShowFileTypes(".m3u;.mp4;");
 	playLists->CTK_setShowTypes(ANYTYPE);
 	playLists->CTK_setShowHidden(false);
 	playLists->CTK_selectFolder(mainApp,folder);

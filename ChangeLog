@@ -1,4 +1,12 @@
-0.1
+0.2.0
+Standardized buttons.
+Fixed various mem leaks.
+Done music.
+Added music page.
+Done prefs.
+Added Prefs page.
+
+0.1.0
 Added movie page
 Added pixmaps
 Start

@@ -24,5 +24,6 @@
 #include "globals.h"
 
 void makeMainPage(void);
+CTK_cursesGadgetClass* newButtonSpread(int bx,int bw,int by,int bh,int gadw,int gadh,int gadcntx,int gadcnty,int gadnumx,int gadnumy,const char *path,bool useimage);
 
 #endif

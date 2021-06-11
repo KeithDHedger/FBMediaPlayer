@@ -50,10 +50,10 @@ enum {MAINPAGE=0,FILMPAGE,TVPAGE,MUSICPAGE,PREFSPAGE};
 
 extern struct fbData			*fbInfo;
 extern const char				*infoStrings[];
-extern const char				*imagePaths[];
-extern bool						useimages;
+extern const char				*buttonNames[][2];
+extern bool						useFBImages;
 extern std::string				outName;
-extern std::string				fifoName;
+extern std::string				musicFifoName;
 extern std::string				commandString;
 
 extern CTK_mainAppClass			*mainApp;

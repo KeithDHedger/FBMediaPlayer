@@ -41,9 +41,16 @@ void makePrefsPage(void)
 	int						geny;
 	std::string				padstr;
 	CTK_cursesButtonClass	*button;
-	CTK_cursesFBImageClass	*img;
 	int						buttonwidth=10;
 	varsStruct				vsitem;
+
+	CTK_cursesGadgetClass	*gadget;
+	int						gw=mainApp->maxCols/8;
+	int						gh=gw/(fbInfo->charHeight/fbInfo->charWidth);
+	int						yspread=2;
+	int						yoffset=0;
+	int						btnnumx=1;
+	int						btnnumy=1;
 
 	prefsPath=getenv("HOME");
 	prefsPath+="/.FBMediaPlayer";
@@ -59,38 +66,27 @@ void makePrefsPage(void)
 			mainApp->utils->CTK_saveVars(prefsPath.c_str(),prefsData);
 		}
 
-fprintf(stderr,"prefsPath=%s\n",prefsPath.c_str());
-mainApp->utils->CTK_saveVars("2",prefsData);
+	mainApp->utils->CTK_saveVars("2",prefsData);
 
 	mainApp->CTK_addPage();
-	if(useimages==true)
+	if(useFBImages==false)
+		gw=10;
+
+//return and save
+	btnnumx=1;
+	btnnumy++;
+	if(useFBImages==true)
 		{
-			int gw=mainApp->maxCols/8;
-			int mult=fbInfo->charHeight/fbInfo->charWidth;
+			gw=gw/2;
+			yspread=4;
+			yoffset=2;
+		}
 //settings
-			geny=mainApp->utils->CTK_getGadgetPos(1,mainApp->maxRows,4,gw,4);
-			genx=mainApp->utils->CTK_getGadgetPos(1,mainApp->maxCols,2,gw,1);
-			img=mainApp->CTK_addNewFBImage(genx,geny,gw/mult,gw,imagePaths[SAVEIMAGE]);
-			img->CTK_setSelectCB(buttonselectCB,(void*)SAVEIMAGE);
+	gadget=newButtonSpread(1,mainApp->maxCols,1,mainApp->maxRows,gw,gh,2,yspread,btnnumx++,btnnumy+yoffset,buttonNames[SAVEIMAGE][int(useFBImages)],useFBImages);
+	gadget->CTK_setSelectCB(buttonselectCB,(void*)SAVEIMAGE);
 //quit
-			genx=mainApp->utils->CTK_getGadgetPos(1,mainApp->maxCols,2,gw,2);
-			img=mainApp->CTK_addNewFBImage(genx,geny,gw/mult,gw,imagePaths[HOMEIMAGE]);
-			img->CTK_setSelectCB(buttonselectCB,(void*)HOMEIMAGE);
-		}
-	else
-		{
-//save
-			geny=mainApp->utils->CTK_getGadgetPosX(1,mainApp->maxRows,4,1,3);
-			genx=mainApp->utils->CTK_getGadgetPos(0,mainApp->maxCols,2,buttonwidth,1);
-			padstr=mainApp->utils->CTK_padString("Save",buttonwidth);
-			button=mainApp->CTK_addNewButton(genx,geny,buttonwidth,1,padstr.c_str());
-			button->CTK_setSelectCB(buttonselectCB,(void*)SAVEIMAGE);
-//cancel
-			genx=mainApp->utils->CTK_getGadgetPos(0,mainApp->maxCols,2,buttonwidth,2);
-			padstr=mainApp->utils->CTK_padString("Cancel",buttonwidth);
-			button=mainApp->CTK_addNewButton(genx,geny,buttonwidth,1,padstr.c_str());
-			button->CTK_setSelectCB(buttonselectCB,(void*)HOMEIMAGE);
-		}
+	gadget=newButtonSpread(1,mainApp->maxCols,1,mainApp->maxRows,gw,gh,2,yspread,btnnumx,btnnumy+yoffset,buttonNames[HOMEIMAGE][int(useFBImages)],useFBImages);
+	gadget->CTK_setSelectCB(buttonselectCB,(void*)HOMEIMAGE);
 
 //set prefs
 	buttonwidth=12;

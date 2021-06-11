@@ -54,7 +54,7 @@ int main(int argc, char **argv)
 			switch (c)
 				{
 					case 'n':
-						useimages=false;
+						useFBImages=false;
 						break;
 
 					case 'v':
@@ -99,7 +99,7 @@ int main(int argc, char **argv)
 
 	sendToPipe("q");
 	commandString="";
-	commandString+="rm '" + fifoName + "' '" + outName + "'";
+	commandString+="rm '" + musicFifoName + "' '" + outName + "'";
 	system(commandString.c_str());
 
 	SETSHOWCURS;

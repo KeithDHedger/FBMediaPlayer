@@ -23,11 +23,12 @@
 struct fbData		*fbInfo;
 
 const char			*infoStrings[]={"FBMediaPlayer","A media player for the linux framebuffer","Copyright (c) 2021 K.D.Hedger","keithdhedger@gmail.com","https://keithdhedger.github.io","K. D. Hedger","GPL 3.0"};
-const char			*imagePaths[]={DATADIR "/pixmaps/film.png",DATADIR "/pixmaps/tv.png",DATADIR "/pixmaps/music.png",DATADIR "/pixmaps/off.png",DATADIR "/pixmaps/settings.png",DATADIR "/pixmaps/home.png",DATADIR "/pixmaps/save.png"};
 
-bool				useimages=true;
+const char			*buttonNames[][2]={{"Movies",DATADIR "/pixmaps/film.png"},{"TV Shows",DATADIR "/pixmaps/tv.png"},{"Music",DATADIR "/pixmaps/music.png"},{"Quit",DATADIR "/pixmaps/off.png"},{"Settings",DATADIR "/pixmaps/settings.png"},{"Home",DATADIR "/pixmaps/home.png"},{"Save",DATADIR "/pixmaps/save.png"}};
+
+bool				useFBImages=true;
 std::string			outName="";
-std::string			fifoName="";
+std::string			musicFifoName="";
 std::string			commandString="";
 
 CTK_mainAppClass	*mainApp;

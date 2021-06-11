@@ -1,6 +1,6 @@
 #
 #
-AC_INIT([FBMediaPlayer],[0.1],[PROJ],[FBMediaPlayer])
+AC_INIT([FBMediaPlayer],[0.2.0],[PROJ],[FBMediaPlayer])
 
 AC_CONFIG_HEADER([config.h])
 AC_PROG_CXX

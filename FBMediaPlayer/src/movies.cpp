@@ -22,31 +22,30 @@
 
 void makeMoviesPage(void)
 {
-	int						genx;
-	int						geny;
-	std::string				padstr;
-	CTK_cursesButtonClass	*button;
-	CTK_cursesFBImageClass	*img;
-
+	CTK_cursesGadgetClass	*gadget;
+	int						gw=mainApp->maxCols/8;
+	int						gh=gw/(fbInfo->charHeight/fbInfo->charWidth);
+	int						yspread=2;
+	int						yoffset=0;
+	int						btnnumx=1;
+	int						btnnumy=1;
+	
 	mainApp->CTK_addPage();
-	if(useimages==true)
+
+	if(useFBImages==false)
+		gw=10;
+
+	btnnumy++;
+	if(useFBImages==true)
 		{
-			int gw=mainApp->maxCols/8;
-			int mult=fbInfo->charHeight/fbInfo->charWidth;
-			geny=mainApp->utils->CTK_getGadgetPosX(1,mainApp->maxRows,4,1,3);
-//home
-			genx=mainApp->utils->CTK_getGadgetPos(1,mainApp->maxCols,3,gw,2);
-			img=mainApp->CTK_addNewFBImage(genx,geny,gw/mult,gw,imagePaths[HOMEIMAGE]);
-			img->CTK_setSelectCB(buttonselectCB,(void*)HOMEIMAGE);
+			gw=gw/2;
+			yspread=4;
+			yoffset=2;
 		}
-	else
-		{
-			int buttonwidth=10;
+
+//line2
+	btnnumx=2;
 //home
-			geny=mainApp->utils->CTK_getGadgetPosX(1,mainApp->maxRows,4,1,3);
-			genx=mainApp->utils->CTK_getGadgetPos(0,mainApp->maxCols,3,buttonwidth,2);
-			padstr=mainApp->utils->CTK_padString("Home",buttonwidth);
-			button=mainApp->CTK_addNewButton(genx,geny,buttonwidth,1,padstr.c_str());
-			button->CTK_setSelectCB(buttonselectCB,(void*)HOMEIMAGE);
-		}
+	gadget=newButtonSpread(1,mainApp->maxCols,1,mainApp->maxRows,gw,gh,3,yspread,btnnumx,btnnumy+yoffset,buttonNames[HOMEIMAGE][int(useFBImages)],useFBImages);
+	gadget->CTK_setSelectCB(buttonselectCB,(void*)HOMEIMAGE);
 }
