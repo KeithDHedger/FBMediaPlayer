@@ -27,6 +27,15 @@ CTK_cursesFBImageClass		*image;
 CTK_cursesFBImageClass		*albumArt;
 CTK_cursesTextBoxClass		*nowPlaying;
 
+const char	*musicPlayerButtons[][2]={{"Start",DATADIR "/pixmaps/MusicPlayer/start.png"},
+{"Prev",DATADIR "/pixmaps/MusicPlayer/prev.png"},
+{"Play",DATADIR "/pixmaps/MusicPlayer/play.png"},
+{"Stop",DATADIR "/pixmaps/MusicPlayer/stop.png"},
+{"Pause",DATADIR "/pixmaps/MusicPlayer/pause.png"},
+{"Next",DATADIR "/pixmaps/MusicPlayer/next.png"},
+{"Last",DATADIR "/pixmaps/MusicPlayer/end.png"},
+{"Quit",DATADIR "/pixmaps/MusicPlayer/quit.png"},
+};
 
 const char					*playListFolder="./";
 const char					*musicFilesFolder="./";
@@ -311,10 +320,6 @@ bool controlsCB(void *inst,void *userdata)
 	return(true);
 }
 
-#include <iostream>
-#include <sstream>
-#include <sstream>
-
 bool playListsCB(void *inst,void *userdata)
 {
 	CTK_cursesChooserClass	*ch=static_cast<CTK_cursesChooserClass*>(inst);
@@ -345,28 +350,25 @@ bool playListsCB(void *inst,void *userdata)
 			playLists->filePath=tempPlaylist;
 		}
 	else
-	{
-	fd=fopen(ch->filePath.c_str(),"r");
-//	fprintf(stderr,"filePath=%s\nfolderpath=%s\nitemno=%i\n from what=%p\n",ch->filePath.c_str(),ch->folderPath.c_str(),ch->lb->listItemNumber,ch->CTK_getCBUserData());
-//	for(int j=ch->lb->listItemNumber;j<ch->lb->listItems.size();j++)
-//		fprintf(stderr,"songpath=%s\n",ch->lb->listItems.at(j)->label.c_str());
-//	exit(0);
-	if(fd!=NULL)
 		{
-			while(feof(fd)==0)
+			fd=fopen(ch->filePath.c_str(),"r");
+			if(fd!=NULL)
 				{
-					buffer[0]=0;
-					fgets(buffer,2048,fd);
-					if(strlen(buffer)>0)
+					while(feof(fd)==0)
 						{
-							buffer[strlen(buffer)-1]=0;
-							sprintf(buffer2,"%s/%s",playListFolder,buffer);
-							songs.push_back(strdup(buffer2));
+							buffer[0]=0;
+							fgets(buffer,2048,fd);
+							if(strlen(buffer)>0)
+								{
+									buffer[strlen(buffer)-1]=0;
+									sprintf(buffer2,"%s/%s",playListFolder,buffer);
+									songs.push_back(strdup(buffer2));
+								}
 						}
+					fclose(fd);
 				}
-			fclose(fd);
 		}
-}
+
 	for(long j=0;j<songs.size();j++)
 		{
 			char	*ptr=strrchr(songs[j],'/');
@@ -380,7 +382,9 @@ bool playListsCB(void *inst,void *userdata)
 			commandString+="'";
 		}
 	else
-		commandString+=ch->filePath + "'";
+		{
+			commandString+=ch->filePath + "'";
+		}
 	sendToPipe(commandString);
 	playing=true;
 	return(true);
@@ -388,16 +392,14 @@ bool playListsCB(void *inst,void *userdata)
 
 void makeMusicPage(void)
 {
-	char					imagepath[PATH_MAX];
 	CTK_cursesGadgetClass	*gadget;
-
-	int gw=mainApp->maxCols/8;
-	int gh=gw/(fbInfo->charHeight/fbInfo->charWidth);
-	int	yspread=2;
-	int yoffset=0;
-	int	btnnumx=1;
-	int	btnnumy=1;
-	int	btncnt=2;
+	int						gw=mainApp->maxCols/8;
+	int						gh=gw/(fbInfo->charHeight/fbInfo->charWidth);
+	int						yspread=2;
+	int						yoffset=0;
+	long					btnnumx=1;
+	int						btnnumy=1;
+	int						btncnt=2;
 
 	if(useFBImages==false)
 		gw=10;
@@ -468,36 +470,18 @@ void makeMusicPage(void)
 	nowPlaying=mainApp->CTK_addNewTextBox(3,chooserHite+4,chooserWidth,3,"");
 	nowPlaying->CTK_setSelectable(false);
 
-	sprintf(imagepath,"%s/MusicPlayer/start.png",resources.c_str());
-	image=mainApp->CTK_addNewFBImage(mainApp->utils->CTK_getGadgetPosX(midWay-(dialogWidth/2),dialogWidth,CONTROLCNT,4,0),controlsSY,4,4,imagepath);
-	image->CTK_setSelectCB(controlsCB,(void*)START);
-	sprintf(imagepath,"%s/MusicPlayer/prev.png",resources.c_str());
-	image=mainApp->CTK_addNewFBImage(mainApp->utils->CTK_getGadgetPosX(midWay-(dialogWidth/2),dialogWidth,CONTROLCNT,4,1),controlsSY,4,4,imagepath);
-	image->CTK_setSelectCB(controlsCB,(void*)PREVIOUS);
-	sprintf(imagepath,"%s/MusicPlayer/play.png",resources.c_str());
-	image=mainApp->CTK_addNewFBImage(mainApp->utils->CTK_getGadgetPosX(midWay-(dialogWidth/2),dialogWidth,CONTROLCNT,4,2),controlsSY,4,4,imagepath);
-	image->CTK_setSelectCB(controlsCB,(void*)PLAY);
-	sprintf(imagepath,"%s/MusicPlayer/stop.png",resources.c_str());
-	image=mainApp->CTK_addNewFBImage(mainApp->utils->CTK_getGadgetPosX(midWay-(dialogWidth/2),dialogWidth,CONTROLCNT,4,3),controlsSY,4,4,imagepath);
-	image->CTK_setSelectCB(controlsCB,(void*)STOP);
-	sprintf(imagepath,"%s/MusicPlayer/pause.png",resources.c_str());
-	image=mainApp->CTK_addNewFBImage(mainApp->utils->CTK_getGadgetPosX(midWay-(dialogWidth/2),dialogWidth,CONTROLCNT,4,4),controlsSY,4,4,imagepath);
-	image->CTK_setSelectCB(controlsCB,(void*)PAUSE);
-	sprintf(imagepath,"%s/MusicPlayer/next.png",resources.c_str());
-	image=mainApp->CTK_addNewFBImage(mainApp->utils->CTK_getGadgetPosX(midWay-(dialogWidth/2),dialogWidth,CONTROLCNT,4,5),controlsSY,4,4,imagepath);
-	image->CTK_setSelectCB(controlsCB,(void*)NEXT);
-	sprintf(imagepath,"%s/MusicPlayer/end.png",resources.c_str());
-	image=mainApp->CTK_addNewFBImage(mainApp->utils->CTK_getGadgetPosX(midWay-(dialogWidth/2),dialogWidth,CONTROLCNT,4,6),controlsSY,4,4,imagepath);
-	image->CTK_setSelectCB(controlsCB,(void*)END);
-
-	sprintf(imagepath,"%s/MusicPlayer/quit.png",resources.c_str());
-	image=mainApp->CTK_addNewFBImage(mainApp->utils->CTK_getGadgetPosX(midWay-(dialogWidth/2),dialogWidth,CONTROLCNT,4,7),controlsSY,4,4,imagepath);
-	image->CTK_setSelectCB(controlsCB,(void*)QUIT);
+	btnnumx=1;
+	for(int j=0;j<CONTROLCNT;j++)
+		{
+			if(useFBImages==true)
+				gadget=mainApp->CTK_addNewFBImage(mainApp->utils->CTK_getGadgetPos(1,mainApp->maxCols,CONTROLCNT,4,btnnumx),controlsSY,4,4,musicPlayerButtons[j][int(useFBImages)]);
+			else
+				gadget=mainApp->CTK_addNewButton(mainApp->utils->CTK_getGadgetPos(1,mainApp->maxCols,CONTROLCNT,10,btnnumx),controlsSY,10,1,musicPlayerButtons[j][int(useFBImages)]);
+				gadget->CTK_setSelectCB(controlsCB,(void*)btnnumx++);
+		}
 
 	albumArt=mainApp->CTK_addNewFBImage(chooserWidth+6,artSY,artHite,artHite,NULL,false);
 	albumArt->CTK_setSelectable(false);
-//files
-//	mainApp->CTK_addPage();
 }
 
 void runMusic(void)
