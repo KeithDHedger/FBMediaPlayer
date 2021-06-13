@@ -27,7 +27,10 @@ CTK_cursesFBImageClass		*image;
 CTK_cursesFBImageClass		*albumArt;
 CTK_cursesTextBoxClass		*nowPlaying;
 
-const char					*folder="./";
+
+const char					*playListFolder="./";
+const char					*musicFilesFolder="./";
+const char					*musicFolder="./";
 int							midWay;
 int							chooserWidth;
 int							songsWidth;
@@ -195,6 +198,7 @@ bool selectSongCB(void *inst,void *userdata)
 
 	commandString="p\\npausing_keep_force loadlist \\\"";
 	commandString+=playLists->filePath + "\\\"";
+	fprintf(stderr,"commandString=%s\n",commandString.c_str());
 	sendToPipe(commandString);
 
 	if((long)sl->listItems[sl->listItemNumber]->userData!=0)
@@ -307,6 +311,10 @@ bool controlsCB(void *inst,void *userdata)
 	return(true);
 }
 
+#include <iostream>
+#include <sstream>
+#include <sstream>
+
 bool playListsCB(void *inst,void *userdata)
 {
 	CTK_cursesChooserClass	*ch=static_cast<CTK_cursesChooserClass*>(inst);
@@ -316,13 +324,33 @@ bool playListsCB(void *inst,void *userdata)
 
 	if((ch->files->data[ch->lb->listItemNumber].fileType==FOLDERTYPE) || (ch->files->data[ch->lb->listItemNumber].fileType==FILELINKTYPE))
 		return(true);
-	folder=ch->folderPath.c_str();
+	playListFolder=ch->folderPath.c_str();
 	for(int j=0;j<songs.size();j++)
 		free(songs[j]);
 	songs.clear();
 	songList->CTK_clearList();
 
+	if(ch->CTK_getCBUserData()==(void*)MUSICFILEIMAGE)
+		{
+			sprintf(buffer,": > '%s'",tempPlaylist);
+			fprintf(stderr,">>%s<<\n",buffer);
+			system(buffer);
+			for(int j=ch->lb->listItemNumber;j<ch->lb->listItems.size();j++)
+				{
+					sprintf(buffer2,"%s/%s",playListFolder,ch->lb->listItems.at(j)->label.c_str());
+					songs.push_back(strdup(buffer2));
+					sprintf(buffer,"echo -e '%s' >> '%s'",buffer2,tempPlaylist);
+					system(buffer);
+				}
+			playLists->filePath=tempPlaylist;
+		}
+	else
+	{
 	fd=fopen(ch->filePath.c_str(),"r");
+//	fprintf(stderr,"filePath=%s\nfolderpath=%s\nitemno=%i\n from what=%p\n",ch->filePath.c_str(),ch->folderPath.c_str(),ch->lb->listItemNumber,ch->CTK_getCBUserData());
+//	for(int j=ch->lb->listItemNumber;j<ch->lb->listItems.size();j++)
+//		fprintf(stderr,"songpath=%s\n",ch->lb->listItems.at(j)->label.c_str());
+//	exit(0);
 	if(fd!=NULL)
 		{
 			while(feof(fd)==0)
@@ -332,12 +360,13 @@ bool playListsCB(void *inst,void *userdata)
 					if(strlen(buffer)>0)
 						{
 							buffer[strlen(buffer)-1]=0;
-							sprintf(buffer2,"%s/%s",folder,buffer);
+							sprintf(buffer2,"%s/%s",playListFolder,buffer);
 							songs.push_back(strdup(buffer2));
 						}
 				}
 			fclose(fd);
 		}
+}
 	for(long j=0;j<songs.size();j++)
 		{
 			char	*ptr=strrchr(songs[j],'/');
@@ -345,7 +374,13 @@ bool playListsCB(void *inst,void *userdata)
 		}
 
 	commandString="loadlist '";
-	commandString+=ch->filePath + "'";
+	if(ch->CTK_getCBUserData()==(void*)MUSICFILEIMAGE)
+		{
+			commandString+=tempPlaylist;
+			commandString+="'";
+		}
+	else
+		commandString+=ch->filePath + "'";
 	sendToPipe(commandString);
 	playing=true;
 	return(true);
@@ -354,8 +389,46 @@ bool playListsCB(void *inst,void *userdata)
 void makeMusicPage(void)
 {
 	char					imagepath[PATH_MAX];
+	CTK_cursesGadgetClass	*gadget;
 
+	int gw=mainApp->maxCols/8;
+	int gh=gw/(fbInfo->charHeight/fbInfo->charWidth);
+	int	yspread=2;
+	int yoffset=0;
+	int	btnnumx=1;
+	int	btnnumy=1;
+	int	btncnt=2;
+
+	if(useFBImages==false)
+		gw=10;
+
+//main music
 	mainApp->CTK_addPage();
+
+//line1
+//playlists
+	gadget=newButtonSpread(1,mainApp->maxCols,1,mainApp->maxRows,gw,gh,btncnt,yspread,btnnumx++,btnnumy,buttonNames[PLAYLISTIMAGE][int(useFBImages)],useFBImages);
+	gadget->CTK_setSelectCB(buttonselectCB,(void*)PLAYLISTIMAGE);
+//files
+	gadget=newButtonSpread(1,mainApp->maxCols,1,mainApp->maxRows,gw,gh,btncnt,yspread,btnnumx++,btnnumy,buttonNames[MUSICFILEIMAGE][int(useFBImages)],useFBImages);
+	gadget->CTK_setSelectCB(buttonselectCB,(void*)MUSICFILEIMAGE);
+//line2
+	btnnumx=1;
+	btnnumy++;
+	if(useFBImages==true)
+		{
+			gw=gw/2;
+			yspread=4;
+			yoffset=2;
+		}
+
+//home
+	gadget=newButtonSpread(1,mainApp->maxCols,1,mainApp->maxRows,gw,gh,1,yspread,btnnumx,btnnumy+yoffset,buttonNames[HOMEIMAGE][int(useFBImages)],useFBImages);
+	gadget->CTK_setSelectCB(buttonselectCB,(void*)HOMEIMAGE);
+
+//playlists
+	mainApp->CTK_addPage();
+
 	midWay=mainApp->maxCols/2;
 	dialogWidth=mainApp->maxCols-4;
 	chooserWidth=((mainApp->maxCols/8)*5)-2;
@@ -383,10 +456,9 @@ void makeMusicPage(void)
 	mainApp->colours.backCol=BACK_WHITE;
 	mainApp->colours.foreCol=FORE_BLACK;
 	playLists=new CTK_cursesChooserClass(mainApp,3,2,chooserWidth,chooserHite);
-	playLists->CTK_setShowFileTypes(".m3u;.mp4;");
 	playLists->CTK_setShowTypes(ANYTYPE);
 	playLists->CTK_setShowHidden(false);
-	playLists->CTK_selectFolder(mainApp,folder);
+	playLists->CTK_selectFolder(mainApp,playListFolder);
 	playLists->CTK_setSelectCB(playListsCB,NULL);
 	mainApp->CTK_addChooserBox(playLists);
 
@@ -424,12 +496,13 @@ void makeMusicPage(void)
 
 	albumArt=mainApp->CTK_addNewFBImage(chooserWidth+6,artSY,artHite,artHite,NULL,false);
 	albumArt->CTK_setSelectable(false);
+//files
+//	mainApp->CTK_addPage();
 }
 
 void runMusic(void)
 {
-	folder=musicPath->CTK_getText();
-	playLists->CTK_selectFolder(mainApp,musicPath->CTK_getText());
+	playLists->CTK_selectFolder(mainApp,musicFolder);
 	playLists->CTK_updateList();
 	mainApp->CTK_clearScreen();//TODO//
 	fflush(NULL);

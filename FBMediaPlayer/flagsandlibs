@@ -5,7 +5,8 @@ AM_CPPFLAGS =	-I$(top_srcdir) \
 			-DSYSCONFDIR=\""${sysconfdir}/${PACKAGE}"\" \
 			-DLIBDIR=\""${libdir}/${PACKAGE}"\" \
 			$(CURSESTOOLKIT_CFLAGS) \
-			$(IMAGEMAGICK_CFLAGS)
+			$(IMAGEMAGICK_CFLAGS) \
+			$(BOOST_CPPFLAGS)
 
 LIBS =		$(CURSESTOOLKIT_LIBS) \
 			$(IMAGEMAGICK_LIBS)

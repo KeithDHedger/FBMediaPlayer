@@ -90,7 +90,8 @@ POST_UNINSTALL = :
 bin_PROGRAMS = fbmediaplayer$(EXEEXT)
 subdir = FBMediaPlayer/app
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/localm4s/boost.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(am__DIST_COMMON)
@@ -211,6 +212,8 @@ AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
+BOOST_CPPFLAGS = @BOOST_CPPFLAGS@
+BOOST_ROOT = @BOOST_ROOT@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
@@ -219,11 +222,13 @@ CPPFLAGS = @CPPFLAGS@
 CURSESTOOLKIT_CFLAGS = @CURSESTOOLKIT_CFLAGS@
 CURSESTOOLKIT_LIBS = @CURSESTOOLKIT_LIBS@
 CXX = @CXX@
+CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DISTCHECK_CONFIGURE_FLAGS = @DISTCHECK_CONFIGURE_FLAGS@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
@@ -257,6 +262,7 @@ PATH_SEPARATOR = @PATH_SEPARATOR@
 PKG_CONFIG = @PKG_CONFIG@
 PKG_CONFIG_LIBDIR = @PKG_CONFIG_LIBDIR@
 PKG_CONFIG_PATH = @PKG_CONFIG_PATH@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -311,7 +317,8 @@ AM_CPPFLAGS = -I$(top_srcdir) \
 			-DSYSCONFDIR=\""${sysconfdir}/${PACKAGE}"\" \
 			-DLIBDIR=\""${libdir}/${PACKAGE}"\" \
 			$(CURSESTOOLKIT_CFLAGS) \
-			$(IMAGEMAGICK_CFLAGS)
+			$(IMAGEMAGICK_CFLAGS) \
+			$(BOOST_CPPFLAGS)
 
 COMMONSRC = ../src/callbacks.cpp ../src/globals.cpp ../src/info.cpp ../src/main.cpp ../src/maingui.cpp ../src/movies.cpp ../src/music.cpp ../src/prefs.cpp ../src/tv.cpp
 fbmediaplayer_SOURCES = $(COMMONSRC)

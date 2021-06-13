@@ -1,5 +1,8 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Defined if the requested minimum BOOST version is satisfied */
+#undef HAVE_BOOST
+
 /* Name of package */
 #undef PACKAGE
 

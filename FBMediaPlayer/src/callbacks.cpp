@@ -61,12 +61,34 @@ bool buttonselectCB(void *inst,void *userdata)
 			case TVIMAGE:
 				mainApp->CTK_setPage(TVPAGE);
 				break;
+
+//music	
 			case MUSICIMAGE:
 				mainApp->CTK_setPage(MUSICPAGE);
+				break;
+
+			case PLAYLISTIMAGE:
+				mainApp->CTK_setPage(PLAYLISTSPAGE);
+				playLists->files->LFSTK_setIgnoreNavLinks(true);
+				playLists->CTK_setShowFileTypes(".m3u;");
+				playLists->CTK_setCBUserData((void*)PLAYLISTIMAGE);
+				musicFolder=prefsData.at(mainApp->utils->CTK_getVarEntry(prefsData,"musicplaylistpath")).charVar.c_str();
 				runMusic();
 				mainApp->CTK_setPage(MAINPAGE);
 				break;
+
+			case MUSICFILEIMAGE:
+				mainApp->CTK_setPage(PLAYLISTSPAGE);
+				playLists->files->LFSTK_setIgnoreNavLinks(false);
+				playLists->CTK_setShowFileTypes(".mp3;.flac;.m4a;");
+				playLists->CTK_setCBUserData((void*)MUSICFILEIMAGE);
+				musicFolder=prefsData.at(mainApp->utils->CTK_getVarEntry(prefsData,"musicfilespath")).charVar.c_str();
+				runMusic();
+				mainApp->CTK_setPage(MAINPAGE);
+				break;
+
 			case PREFSIMAGE:
+			fprintf(stderr,"PREFSPAGE=%i\n",PREFSPAGE);
 				mainApp->CTK_setPage(PREFSPAGE);
 				break;
 //prefs
@@ -78,8 +100,13 @@ bool buttonselectCB(void *inst,void *userdata)
 				setFromBoxPath(tvPath,"tvpath");
 				break;
 
-			case SETMUSICPREFS:
-				setFromBoxPath(musicPath,"musicpath");
+//playlists
+			case SETMUSICPLAYLISTPREFS:
+				setFromBoxPath(musicPlaylistPath,"musicplaylistpath");
+				break;
+//music files
+			case SETMUSICFILESPREFS:
+				setFromBoxPath(musicFilesPath,"musicfilespath");
 				break;
 //save prefs
 			case SAVEIMAGE:

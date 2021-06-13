@@ -1,6 +1,8 @@
 
 AUTOMAKE_OPTIONS = subdir-objects
 
+AM_CPPFLAGS = $(BOOST_CPPFLAGS)
+ 
 include ../flagsandlibs
 include ../sources
 

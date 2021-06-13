@@ -32,7 +32,8 @@ extern std::string				prefsPath;
 
 extern CTK_cursesInputClass		*videoPath;
 extern CTK_cursesInputClass		*tvPath;
-extern CTK_cursesInputClass		*musicPath;
+extern CTK_cursesInputClass		*musicPlaylistPath;
+extern CTK_cursesInputClass		*musicFilesPath;
 
 void updatePrefs(void);
 void makePrefsPage(void);

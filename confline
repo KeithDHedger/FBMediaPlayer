@@ -12,7 +12,7 @@ fi
 if [ "X$1" == "Xconf" ];then
 	make distclean || true
 	rm -rf FBMediaPlayer/src/.deps
-	CURSESTOOLKIT_CFLAGS="-I../../../CursesToolKit/CursesToolKit/src" LDFLAGS="-L../../../CursesToolKit/CursesToolKit/lib/.libs" CFLAGS="$CURSESTOOLKIT_CFLAGS -g -O0" CXXFLAGS="$CURSESTOOLKIT_CFLAGS -g -O0 -Wunused-variable" ./autogen.sh --prefix=/usr
+	CURSESTOOLKIT_CFLAGS="-I../../../CursesToolKit/CursesToolKit/src" LDFLAGS="-L../../../CursesToolKit/CursesToolKit/lib/.libs" CFLAGS="$CURSESTOOLKIT_CFLAGS -g -O0" CXXFLAGS="$CURSESTOOLKIT_CFLAGS -g -O0 -Wunused-variable" ./autogen.sh --prefix=/usr --datadir=/media/LinuxData/Development64/Projects/FBMediaPlayer/FBMediaPlayer/resources
 else
 	if [ "X$1" = "Xmake" ];then
 		(cd ../CursesToolKit/;make -j4)

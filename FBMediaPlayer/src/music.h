@@ -31,6 +31,11 @@
 #define CONTROLCNT 8
 enum {START=1,PREVIOUS,PLAY,STOP,PAUSE,NEXT,END,QUIT};
 
+extern CTK_cursesChooserClass	*playLists;
+extern const char				*playListFolder;
+extern const char				*musicFilesFolder;
+extern const char				*musicFolder;
+
 void getMeta(void);
 void makeMusicPage(void);
 void runMusic(void);
