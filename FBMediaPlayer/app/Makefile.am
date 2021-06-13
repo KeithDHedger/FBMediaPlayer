@@ -1,14 +1,10 @@
 
 AUTOMAKE_OPTIONS = subdir-objects
 
-AM_CPPFLAGS = $(BOOST_CPPFLAGS)
- 
 include ../flagsandlibs
 include ../sources
 
 fbmediaplayer_SOURCES = $(COMMONSRC)
-
-fbmediaplayer_CFLAGS = -O3
 
 scriptfilesdir = $(pkgdatadir)/scripts
 scriptfiles_SCRIPTS = ../resources/scripts/*

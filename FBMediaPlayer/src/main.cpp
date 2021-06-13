@@ -75,13 +75,13 @@ int main(int argc, char **argv)
 				}
 		}
 
-	std::string data="abc def";
-	const char *ac="abcdef1920";
-	std::string command=str(boost::format("hello %s %p %s %s") %"world" %32767 %data %ac);
-	fprintf(stderr,">>%s<<\n",command.c_str());
-	command=str(boost::format("hello %s %i") %"keith" %68713);
-	fprintf(stderr,">>%s<<\n",command.c_str());
-	exit(100);
+//	std::string data="abc def";
+//	const char *ac="abcdef1920";
+//	std::string command=str(boost::format("hello %s %p %s %s") %"world" %32767 %data %ac);
+//	fprintf(stderr,">>%s<<\n",command.c_str());
+//	command=str(boost::format("hello %s %i") %"keith" %68713);
+//	fprintf(stderr,">>%s<<\n",command.c_str());
+//	exit(100);
 
 
 	mkdir(TEMPFILES,0700);

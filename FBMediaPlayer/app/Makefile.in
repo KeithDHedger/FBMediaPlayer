@@ -322,7 +322,6 @@ AM_CPPFLAGS = -I$(top_srcdir) \
 
 COMMONSRC = ../src/callbacks.cpp ../src/globals.cpp ../src/info.cpp ../src/main.cpp ../src/maingui.cpp ../src/movies.cpp ../src/music.cpp ../src/prefs.cpp ../src/tv.cpp
 fbmediaplayer_SOURCES = $(COMMONSRC)
-fbmediaplayer_CFLAGS = -O3
 scriptfilesdir = $(pkgdatadir)/scripts
 scriptfiles_SCRIPTS = ../resources/scripts/*
 man1_MANS = ../resources/man/fbmediaplayer.1
