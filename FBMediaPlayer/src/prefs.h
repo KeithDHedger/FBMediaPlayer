@@ -34,6 +34,7 @@ extern CTK_cursesInputClass		*videoPath;
 extern CTK_cursesInputClass		*tvPath;
 extern CTK_cursesInputClass		*musicPlaylistPath;
 extern CTK_cursesInputClass		*musicFilesPath;
+extern CTK_cursesInputClass		*backDropPath;
 
 void updatePrefs(void);
 void makePrefsPage(void);

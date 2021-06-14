@@ -20,13 +20,20 @@
  
 #include "prefs.h"
 
-std::vector<varsStruct>		prefsData={{"filmpath",CHARVAR,-1,false,-1,getenv("HOME") + std::string("/Videos")},{"tvpath",CHARVAR,-1,false,-1,getenv("HOME") + std::string("/Videos")},{"musicplaylistpath",CHARVAR,-1,false,-1,getenv("HOME") + std::string("/Music")},{"musicfilespath",CHARVAR,-1,false,-1,getenv("HOME") + std::string("/Music")}};
-std::string				prefsPath;
+std::vector<varsStruct>		prefsData={
+{"filmpath",CHARVAR,-1,false,-1,getenv("HOME") + std::string("/Videos")},
+{"tvpath",CHARVAR,-1,false,-1,getenv("HOME") + std::string("/Videos")},
+{"musicplaylistpath",CHARVAR,-1,false,-1,getenv("HOME") + std::string("/Music")},
+{"musicfilespath",CHARVAR,-1,false,-1,getenv("HOME") + std::string("/Music")},
+{"backdroppath",CHARVAR,-1,false,-1,getenv("HOME") + std::string("/Wallpapers")}
+};
+std::string					prefsPath;
 
 CTK_cursesInputClass		*videoPath;
 CTK_cursesInputClass		*tvPath;
 CTK_cursesInputClass		*musicPlaylistPath;
 CTK_cursesInputClass		*musicFilesPath;
+CTK_cursesInputClass		*backDropPath;
 
 void updatePrefs(void)
 {
@@ -34,6 +41,7 @@ void updatePrefs(void)
 	prefsData.at(mainApp->utils->CTK_getVarEntry(prefsData,"tvpath")).charVar=tvPath->CTK_getText();
 	prefsData.at(mainApp->utils->CTK_getVarEntry(prefsData,"musicplaylistpath")).charVar=musicPlaylistPath->CTK_getText();
 	prefsData.at(mainApp->utils->CTK_getVarEntry(prefsData,"musicfilespath")).charVar=musicFilesPath->CTK_getText();
+	prefsData.at(mainApp->utils->CTK_getVarEntry(prefsData,"backdroppath")).charVar=backDropPath->CTK_getText();
 	mainApp->utils->CTK_saveVars(prefsPath.c_str(),prefsData);
 }
 
@@ -49,8 +57,8 @@ void makePrefsPage(void)
 	CTK_cursesGadgetClass	*gadget;
 	int						gw=mainApp->maxCols/8;
 	int						gh=gw/(fbInfo->charHeight/fbInfo->charWidth);
-	int						yspread=2;
-	int						yoffset=0;
+	int						yspread=4;
+	int						yoffset=2;
 	int						btnnumx=1;
 	int						btnnumy=1;
 
@@ -113,13 +121,24 @@ mainApp->utils->CTK_saveVars("2",prefsData);
 	padstr=mainApp->utils->CTK_padString("Playlists",buttonwidth);
 	button=mainApp->CTK_addNewButton(genx,geny,buttonwidth,1,padstr.c_str());
 	button->CTK_setSelectCB(buttonselectCB,(void*)SETMUSICPLAYLISTPREFS);
-	vsitem=mainApp->utils->CTK_findVar(prefsData,"musicpath");
+	vsitem=mainApp->utils->CTK_findVar(prefsData,"musicplaylistpath");
 	musicPlaylistPath=mainApp->CTK_addNewInput(genx+buttonwidth+6,geny,buttonwidth*4,1,vsitem.charVar.c_str());
 //music music path
 	geny+=4;
 	padstr=mainApp->utils->CTK_padString("Files",buttonwidth);
 	button=mainApp->CTK_addNewButton(genx,geny,buttonwidth,1,padstr.c_str());
 	button->CTK_setSelectCB(buttonselectCB,(void*)SETMUSICFILESPREFS);
-	vsitem=mainApp->utils->CTK_findVar(prefsData,"musicpath");
+	vsitem=mainApp->utils->CTK_findVar(prefsData,"musicfilespath");
 	musicFilesPath=mainApp->CTK_addNewInput(genx+buttonwidth+6,geny,buttonwidth*4,1,vsitem.charVar.c_str());
+//backdrop path
+	geny+=4;
+	padstr=mainApp->utils->CTK_padString("Backdrop",buttonwidth);
+	button=mainApp->CTK_addNewButton(genx,geny,buttonwidth,1,padstr.c_str());
+	button->CTK_setSelectCB(buttonselectCB,(void*)SETBACKDROPPREFS);
+	vsitem=mainApp->utils->CTK_findVar(prefsData,"backdroppath");
+	if(vsitem.vType==BADTYPE)
+		fprintf(stderr,">>>>>>\n");
+//		backDropPath=
+	backDropPath=mainApp->CTK_addNewInput(genx+buttonwidth+6,geny,buttonwidth*4,1,vsitem.charVar.c_str());
+
 }

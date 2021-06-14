@@ -85,7 +85,8 @@ int main(int argc, char **argv)
 
 
 	mkdir(TEMPFILES,0700);
-	musicFifoName=TEMPFILES "/mplayerafifo" + std::to_string(getpid());
+	//musicFifoName=TEMPFILES "/mplayerafifo" + std::to_string(getpid());
+	musicFifoName=str(boost::format("%s/mplayerafifo%i") %TEMPFILES %getpid());
 	videoFifoName=TEMPFILES "/mplayervfifo" + std::to_string(getpid());
 	outName=TEMPFILES "/mplayerout" + std::to_string(getpid());
 	mkfifo(musicFifoName.c_str(),0700);
