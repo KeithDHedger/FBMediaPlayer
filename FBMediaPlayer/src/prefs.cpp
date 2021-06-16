@@ -69,7 +69,7 @@ void makePrefsPage(void)
 
 	if(access(prefsPath.c_str(),F_OK)==0)
 		{
-			prefsData=mainApp->utils->CTK_loadVars(prefsPath.c_str());
+			prefsData=mainApp->utils->CTK_loadVars(prefsPath.c_str(),false,prefsData);
 		}
 	else
 		{
@@ -124,21 +124,18 @@ mainApp->utils->CTK_saveVars("2",prefsData);
 	vsitem=mainApp->utils->CTK_findVar(prefsData,"musicplaylistpath");
 	musicPlaylistPath=mainApp->CTK_addNewInput(genx+buttonwidth+6,geny,buttonwidth*4,1,vsitem.charVar.c_str());
 //music music path
-	geny+=4;
+//	geny+=4;
 	padstr=mainApp->utils->CTK_padString("Files",buttonwidth);
-	button=mainApp->CTK_addNewButton(genx,geny,buttonwidth,1,padstr.c_str());
+	button=mainApp->CTK_addNewButton(genx-4+(buttonwidth*6),geny,buttonwidth,1,padstr.c_str());
 	button->CTK_setSelectCB(buttonselectCB,(void*)SETMUSICFILESPREFS);
 	vsitem=mainApp->utils->CTK_findVar(prefsData,"musicfilespath");
-	musicFilesPath=mainApp->CTK_addNewInput(genx+buttonwidth+6,geny,buttonwidth*4,1,vsitem.charVar.c_str());
+	musicFilesPath=mainApp->CTK_addNewInput(genx+2+(buttonwidth*7),geny,buttonwidth*4,1,vsitem.charVar.c_str());
 //backdrop path
 	geny+=4;
 	padstr=mainApp->utils->CTK_padString("Backdrop",buttonwidth);
 	button=mainApp->CTK_addNewButton(genx,geny,buttonwidth,1,padstr.c_str());
 	button->CTK_setSelectCB(buttonselectCB,(void*)SETBACKDROPPREFS);
 	vsitem=mainApp->utils->CTK_findVar(prefsData,"backdroppath");
-	if(vsitem.vType==BADTYPE)
-		fprintf(stderr,">>>>>>\n");
-//		backDropPath=
 	backDropPath=mainApp->CTK_addNewInput(genx+buttonwidth+6,geny,buttonwidth*4,1,vsitem.charVar.c_str());
 
 }

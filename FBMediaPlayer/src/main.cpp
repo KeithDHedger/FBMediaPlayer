@@ -108,6 +108,10 @@ int main(int argc, char **argv)
 	makeMusicPage();
 	makePrefsPage();
 
+//backdrop
+	if(useFBImages==true)
+		mainApp->CTK_setFBBackDrop(backDropPath->CTK_getText());
+
 	mainApp->CTK_setPage(MAINPAGE);
 	mainApp->CTK_clearScreen();//TODO//
 	fflush(NULL);

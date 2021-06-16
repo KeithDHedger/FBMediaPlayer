@@ -46,7 +46,6 @@ CTK_cursesGadgetClass* newButtonSpread(int bx,int bw,int by,int bh,int gadw,int 
 	return(NULL);
 }
 
-
 void makeMainPage(void)
 {
 	CTK_cursesGadgetClass	*gadget;

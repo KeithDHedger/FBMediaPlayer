@@ -19,18 +19,20 @@
  */
 
 #include "callbacks.h"
+#include <boost/filesystem.hpp>
 
 void setFromBoxPath(CTK_cursesInputClass *box,const char *varname,bool isfolder)
 {
-	const char	*folder;
+	boost::filesystem::path folder=box->CTK_getText();
+	if (boost::filesystem::is_regular_file(folder))
+		folder.remove_filename();
 
-	folder=box->CTK_getText();
-	if(access(folder,F_OK)!=0)
+	if(access(folder.c_str(),F_OK)!=0)
 		folder=getenv("HOME");
 	if(isfolder==true)
-		mainApp->utils->CTK_fileChooserDialog(folder,CUOPENFOLDER);
+		mainApp->utils->CTK_fileChooserDialog(folder.c_str(),CUOPENFOLDER);
 	else
-		mainApp->utils->CTK_fileChooserDialog(folder,CUOPENFILE);
+		mainApp->utils->CTK_fileChooserDialog(folder.c_str(),CUOPENFILE);
 	if(mainApp->utils->dialogReturnData.isValidData==true)
 		{ 
 			box->CTK_setText(mainApp->utils->dialogReturnData.stringValue.c_str());
@@ -43,14 +45,7 @@ void setFromBoxPath(CTK_cursesInputClass *box,const char *varname,bool isfolder)
 
 bool buttonselectCB(void *inst,void *userdata)
 {
-	//CTK_cursesGadgetClass	*bc;
-	//const char	*folder;
-
-	//if(useFBImages==true)
-		{
-			//bc=static_cast<CTK_cursesGadgetClass*>(inst);
-			fflush(NULL);
-		}
+	fflush(NULL);
 
 	switch((long)userdata)
 		{
@@ -116,6 +111,9 @@ bool buttonselectCB(void *inst,void *userdata)
 //backdrop
 			case SETBACKDROPPREFS:
 				setFromBoxPath(backDropPath,"backdroppath",false);
+//backdrop
+				if(useFBImages==true)
+					mainApp->CTK_setFBBackDrop(backDropPath->CTK_getText());
 				break;
 
 //save prefs
