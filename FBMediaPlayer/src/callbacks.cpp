@@ -19,7 +19,6 @@
  */
 
 #include "callbacks.h"
-#include <boost/filesystem.hpp>
 
 void setFromBoxPath(CTK_cursesInputClass *box,const char *varname,bool isfolder)
 {

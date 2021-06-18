@@ -78,7 +78,6 @@ void makePrefsPage(void)
 
 mainApp->utils->CTK_saveVars("2",prefsData);
 
-	mainApp->CTK_addPage();
 	if(useFBImages==false)
 		gw=10;
 

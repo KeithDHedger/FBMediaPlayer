@@ -56,7 +56,9 @@ void makeMainPage(void)
 	int yoffset=0;
 	int	btnnumx=1;
 	int	btnnumy=1;
-	
+
+	mainApp->CTK_addPage();
+
 	if(useFBImages==false)
 		gw=10;
 

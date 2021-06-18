@@ -24,10 +24,18 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "config.h"
+#include <string>
+#include <vector>
 
+
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
 #include <boost/format.hpp>
+#include <boost/filesystem.hpp>
+
 #include <cursesGlobals.h>
+
+#include "config.h"
 
 #include "info.h"
 #include "maingui.h"
@@ -44,7 +52,7 @@
 enum {INFOAPPNAME=0,INFOAPPINFO,INFOCOPYRITE,INFOEMAIL,INFOWEBSITE,INFOCREDITS,INFOLICENCE,DIALOGWIDTH};
 enum {FILMIMAGE=0,TVIMAGE,MUSICIMAGE,OFFIMAGE,PREFSIMAGE,HOMEIMAGE,SAVEIMAGE,CANCELIMAGE,UPIMAGE,PLAYLISTIMAGE,MUSICFILEIMAGE};
 enum {SETFILMPREFS=100,SETTVPREFS,SETMUSICPLAYLISTPREFS,SETMUSICFILESPREFS,SETBACKDROPPREFS};
-enum {MAINPAGE=0,FILMPAGE,TVPAGE,MUSICPAGE,PLAYLISTSPAGE,PREFSPAGE};
+enum {PREFSPAGE=0,MAINPAGE,FILMPAGE,TVPAGE,MUSICPAGE,PLAYLISTSPAGE,};
 
 extern struct fbData			*fbInfo;
 extern const char				*infoStrings[];

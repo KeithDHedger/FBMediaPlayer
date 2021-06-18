@@ -58,61 +58,24 @@ char						*oldfile=NULL;
 bool						updated=false;
 bool						doQuitMusic=false;
 
-char* oneLiner(const char* fmt,...)
+std::vector<std::string> runApplication(std::string com)
 {
-	FILE	*fp;
-	va_list	ap;
-	char	*buffer,*subbuffer;
+	FILE						*fp;
+	char						*buffer=(char*)alloca(1024);
+	std::vector<std::string>	splits;
+	std::string					retstr="";
 
-	buffer=(char*)alloca(PATH_MAX);
-	subbuffer=(char*)alloca(PATH_MAX);
-
-	buffer[0]=0;
-	subbuffer[0]=0;
-	va_start(ap, fmt);
-	while (*fmt)
-		{
-			subbuffer[0]=0;
-			if(fmt[0]=='%')
-				{
-					fmt++;
-					switch(*fmt)
-						{
-							case 's':
-								sprintf(subbuffer,"%s",va_arg(ap,char*));
-								break;
-							case 'i':
-								sprintf(subbuffer,"%i",va_arg(ap,int));
-								break;
-							case '%':
-								sprintf(subbuffer,"%%");
-								break;
-							default:
-								sprintf(subbuffer,"%c",fmt[0]);
-								break;
-						}
-				}
-			else
-				sprintf(subbuffer,"%c",fmt[0]);
-			strcat(buffer,subbuffer);
-			fmt++;
-		}
-	va_end(ap);
-
-	fp=popen(buffer,"r");
+	fp=popen(com.c_str(),"r");
 	if(fp!=NULL)
 		{
 			buffer[0]=0;
-			fgets(buffer,PATH_MAX,fp);
-			if(strlen(buffer)>0)
-				{
-					if(buffer[strlen(buffer)-1] =='\n')
-						buffer[strlen(buffer)-1]=0;
-				}
+			while(fgets(buffer,1024,fp))
+				retstr+=buffer;
 			pclose(fp);
-			return(strdup(buffer));
 		}
-	return(NULL);
+	boost::algorithm::split(splits,retstr,boost::is_any_of("\n"));
+
+	return(splits);
 }
 
 void sendToPipe(const std::string command)
@@ -124,77 +87,59 @@ void sendToPipe(const std::string command)
 
 void getMeta(void)
 {
-	char	*filename;
-	char	*album;
-	char	*title;
-	char	*artist;
-	char	*all;
-	char	*jpeg;
+	std::string album="";
+	std::string title="";
+	std::string artist="";
+	std::string all="";
 
 	if((playing==false) || (paused==true) || (doQuitMusic==true))
 		return;
 
-	commandString="get_property path\\nget_meta_album\\nget_meta_title\\nget_meta_artist";
+	commandString="get_property path\\nget_file_name\\nget_meta_album\\nget_meta_title\\nget_meta_artist";
 	sendToPipe(commandString);
 
-	filename=oneLiner("tail -n4 '%s' |sed -n '1p'|awk -F= '{print $2}'",outName.c_str());
+	std::vector<std::string> lines=runApplication(str(boost::format("tail -n5 '%s'") %outName));
 
-	if(strcmp(filename,"(null)")==0)
+	if(lines.size()==6)
 		{
-			for(int j=0;j<songs.size();j++)
-				free(songs[j]);
-			songs.clear();
-			songList->CTK_clearList();
-			albumArt->CTK_newFBImage(chooserWidth+6,artSY,artHite*2,artHite,"",false);
-			nowPlaying->CTK_updateText("");
-			mainApp->CTK_setDefaultGadget(playLists->lb);
-			mainApp->CTK_clearScreen();
-			mainApp->CTK_updateScreen(mainApp,(void*)1);
-			playing=false;
-			paused=false;
-			doQuitMusic=true;
-			return;
+			if(lines.at(0).find("ANS_path=") != 0)
+				return;
 		}
+	else
+		return;
+
+	boost::filesystem::path folder=lines.at(0).substr(lines.at(0).find("=")+1);
+	if (boost::filesystem::is_regular_file(folder))
+		folder.remove_filename();
+	folder+="/folder.jpg";
 
 	if(oldfile!=NULL)
 		{
-			if(strcmp(filename,oldfile)==0)
+			if(lines.at(0).compare(oldfile)==0)
 				{
 					while(updated==false)
 						{
-							album=oneLiner("tail -n4 '%s' |sed -n '2p'|awk -F= '{print $2}'|sed -n 's/^.\\(.*\\).$/\\1/p'",outName.c_str());
-							title=oneLiner("tail -n4 '%s' |sed -n '3p'|awk -F= '{print $2}'|sed -n 's/^.\\(.*\\).$/\\1/p'",outName.c_str());
-							artist=oneLiner("tail -n4 '%s' |sed -n '4p'|awk -F= '{print $2}'|sed -n 's/^.\\(.*\\).$/\\1/p'",outName.c_str());
-							asprintf(&all,"Album:  %s\nArtist: %s\nSong:   %s\n",album,artist,title);
-
-							nowPlaying->CTK_updateText(all,false,false);
+							album=lines.at(2).substr(lines.at(2).find("='")+2,lines.at(2).length()-lines.at(2).find("='")-3);
+							title=lines.at(3).substr(lines.at(3).find("='")+2,lines.at(3).length()-lines.at(3).find("='")-3);
+							artist=lines.at(4).substr(lines.at(4).find("='")+2,lines.at(4).length()-lines.at(4).find("='")-3);
+							all=str(boost::format("Album:  %s\nArtist: %s\nSong:   %s\n") %album %artist %title);
+							nowPlaying->CTK_updateText(all.c_str(),false,false);
 							updated=true;
-							free(title);
-							free(album);
-							free(artist);
-							free(all);
 
-							commandString=":>'";
-							commandString+=outName + "'";
+							commandString=str(boost::format(":>'%s'") %outName);
 							system(commandString.c_str());
-							asprintf(&jpeg,"%s/folder.jpg",dirname(filename));
-							albumArt->CTK_newFBImage(chooserWidth+6,artSY,artHite*2,artHite,jpeg,false);
+							albumArt->CTK_newFBImage(chooserWidth+6,artSY,artHite*2,artHite,folder.c_str(),false);
 							mainApp->CTK_updateScreen(mainApp,NULL);
-							free(jpeg);
 						}
-
-					free(filename);
-					commandString=":>'";
-					commandString+=outName + "'";
+					commandString=str(boost::format(":>'%s'") %outName);
 					system(commandString.c_str());
 					return;
 				}
 		}
+
 	if(oldfile!=NULL)
 		free(oldfile);
-	oldfile=strdup(filename);
-	if(filename!=NULL)
-		free(filename);
+	oldfile=strdup(lines.at(0).c_str());
 	updated=false;
 }
 
@@ -207,7 +152,6 @@ bool selectSongCB(void *inst,void *userdata)
 
 	commandString="p\\npausing_keep_force loadlist \\\"";
 	commandString+=playLists->filePath + "\\\"";
-	fprintf(stderr,"commandString=%s\n",commandString.c_str());
 	sendToPipe(commandString);
 
 	if((long)sl->listItems[sl->listItemNumber]->userData!=0)
@@ -338,7 +282,6 @@ bool playListsCB(void *inst,void *userdata)
 	if(ch->CTK_getCBUserData()==(void*)MUSICFILEIMAGE)
 		{
 			sprintf(buffer,": > '%s'",tempPlaylist);
-			fprintf(stderr,">>%s<<\n",buffer);
 			system(buffer);
 			for(int j=ch->lb->listItemNumber;j<ch->lb->listItems.size();j++)
 				{
@@ -440,11 +383,6 @@ void makeMusicPage(void)
 	songsHite=(chooserHite+4)/2;
 	artSY=songsHite+4;
 	artHite=songsHite;
-	musicFifoName="/tmp/mplayerfifo" + std::to_string(getpid());
-	outName="/tmp/mplayerout" + std::to_string(getpid());
-	commandString="mkfifo '";
-	commandString+=musicFifoName + "'";
-	system(commandString.c_str());
 
 //start mplayer
 	commandString="";

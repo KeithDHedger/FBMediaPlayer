@@ -75,20 +75,10 @@ int main(int argc, char **argv)
 				}
 		}
 
-//	std::string data="abc def";
-//	const char *ac="abcdef1920";
-//	std::string command=str(boost::format("hello %s %p %s %s") %"world" %32767 %data %ac);
-//	fprintf(stderr,">>%s<<\n",command.c_str());
-//	command=str(boost::format("hello %s %i") %"keith" %68713);
-//	fprintf(stderr,">>%s<<\n",command.c_str());
-//	exit(100);
-
-
 	mkdir(TEMPFILES,0700);
-	//musicFifoName=TEMPFILES "/mplayerafifo" + std::to_string(getpid());
 	musicFifoName=str(boost::format("%s/mplayerafifo%i") %TEMPFILES %getpid());
-	videoFifoName=TEMPFILES "/mplayervfifo" + std::to_string(getpid());
-	outName=TEMPFILES "/mplayerout" + std::to_string(getpid());
+	videoFifoName=str(boost::format("%s/mplayervfifo%i") %TEMPFILES %getpid());
+	outName=str(boost::format("%s/mplayerout%i") %TEMPFILES %getpid());
 	mkfifo(musicFifoName.c_str(),0700);
 	mkfifo(videoFifoName.c_str(),0700);
 
@@ -102,11 +92,11 @@ int main(int argc, char **argv)
 	fprintf(stderr,"cols=%i rows=%i fbwidth=%i fbhite=%i fbcharw=%i fbcharh=%i inatty=%i datadir=%s\n",mainApp->maxCols,mainApp->maxRows,fbInfo->screenWidth,fbInfo->screenHeight,fbInfo->charWidth,fbInfo->charHeight,isatty(fileno(stdout)),DATADIR);
 
 	SETHIDECURS;
+	makePrefsPage();
 	makeMainPage();
 	makeMoviesPage();
 	makeTVPage();
 	makeMusicPage();
-	makePrefsPage();
 
 //backdrop
 	if(useFBImages==true)
