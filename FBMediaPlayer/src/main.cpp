@@ -32,13 +32,13 @@ struct option long_options[] =
 
 void printHelp()
 {
-	printf("Usage: %s [OPTION] [TEXT]\n"
+	printf("Usage: fbmediaplayer [OPTION]\n"
 		"Frame Buffer Media Player\n"
 		" -n, --noimages	Don't use images\n"
 		" -v, --version	output version information and exit\n"
 		" -h, -?, --help	print this help\n\n"
 		"Report bugs to keithdhedger@gmail.com\n"
-		,PACKAGE);
+		);
 }
 
 int main(int argc, char **argv)
