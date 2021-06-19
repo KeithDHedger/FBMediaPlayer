@@ -26,9 +26,7 @@ PKG_CHECK_MODULES(IMAGEMAGICK,$IMAGEMAGICK_MODULES)
 AC_SUBST(IMAGEMAGICK_CFLAGS)
 AC_SUBST(IMAGEMAGICK_LIBS)
 
-#BOOST_REQUIRE([1.63.0])
-#BOOST_FILESYSTEM([mt])
-AX_BOOST_BASE([1.48],, [AC_MSG_ERROR([libfoo needs Boost, but it was not found in your system])])
+AX_BOOST_BASE([1.63],, [AC_MSG_ERROR([FBMediaPlayer needs Boost, but it was not found in your system])])
 AX_BOOST_SYSTEM
 AX_BOOST_FILESYSTEM
 
