@@ -68,15 +68,11 @@ void makePrefsPage(void)
 	prefsPath+="/fbmediaplayerprefs.rc";
 
 	if(access(prefsPath.c_str(),F_OK)==0)
-		{
-			prefsData=mainApp->utils->CTK_loadVars(prefsPath.c_str(),false,prefsData);
-		}
+		prefsData=mainApp->utils->CTK_loadVars(prefsPath.c_str(),false,prefsData);
 	else
-		{
-			mainApp->utils->CTK_saveVars(prefsPath.c_str(),prefsData);
-		}
+		mainApp->utils->CTK_saveVars(prefsPath.c_str(),prefsData);
 
-mainApp->utils->CTK_saveVars("2",prefsData);
+//mainApp->utils->CTK_saveVars("2",prefsData);
 
 	if(useFBImages==false)
 		gw=10;

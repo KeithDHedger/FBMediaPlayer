@@ -87,7 +87,6 @@ bool buttonselectCB(void *inst,void *userdata)
 				break;
 
 			case PREFSIMAGE:
-			//fprintf(stderr,"PREFSPAGE=%i\n",PREFSPAGE);
 				mainApp->CTK_setPage(PREFSPAGE);
 				break;
 //prefs
@@ -125,7 +124,6 @@ bool buttonselectCB(void *inst,void *userdata)
 				break;
 		}
 	mainApp->CTK_updateScreen(mainApp,NULL);//TODO//
-	//fprintf(stderr,"button=%i x=%i y=%i\n",(long)userdata,bc->sx,bc->sy);
 	return(true);
 }
 

@@ -95,8 +95,8 @@ void getMeta(void)
 	if((playing==false) || (paused==true) || (doQuitMusic==true))
 		return;
 
-	commandString="get_property path\\nget_file_name\\nget_meta_album\\nget_meta_title\\nget_meta_artist";
-	sendToPipe(commandString);
+	//commandString="get_property path\\nget_file_name\\nget_meta_album\\nget_meta_title\\nget_meta_artist";
+	sendToPipe("get_property path\\nget_file_name\\nget_meta_album\\nget_meta_title\\nget_meta_artist");
 
 	std::vector<std::string> lines=runApplication(str(boost::format("tail -n5 '%s'") %outName));
 
@@ -150,16 +150,10 @@ bool selectSongCB(void *inst,void *userdata)
 	if(sl->listItems.size()==0)
 		return(true);
 
-	commandString="p\\npausing_keep_force loadlist \\\"";
-	commandString+=playLists->filePath + "\\\"";
-	sendToPipe(commandString);
+	sendToPipe(str(boost::format("p\\npausing_keep_force loadlist \\\"%s\\\"") %playLists->filePath));
 
 	if((long)sl->listItems[sl->listItemNumber]->userData!=0)
-		{
-			commandString="pausing_keep_force pt_step ";
-			commandString+=std::to_string((long)sl->listItems[sl->listItemNumber]->userData) + "\\np";
-			sendToPipe(commandString);
-		}
+		sendToPipe(str(boost::format("pausing_keep_force pt_step %i") %(long)sl->listItems[sl->listItemNumber]->userData));
 	else
 		sendToPipe("p");
 
@@ -177,9 +171,7 @@ bool controlsCB(void *inst,void *userdata)
 			case START:
 				if(playing==false)
 					return(true);
-				commandString="loadlist \\\"";
-				commandString+=playLists->filePath + "\\\"";
-				sendToPipe(commandString);
+				sendToPipe(str(boost::format("loadlist \\\"%s\\\"") %playLists->filePath));
 				playing=true;
 				paused=false;
 				break;
@@ -228,12 +220,8 @@ bool controlsCB(void *inst,void *userdata)
 			case END:
 				if(playing==false)
 					return(true);
-				commandString="p\\npausing_keep_force loadlist \\\"";
-				commandString+=playLists->filePath + "\\\"";
-				sendToPipe(commandString);
-				commandString="pausing_keep_force pt_step ";
-				commandString+=std::to_string(songs.size()-1) + "\\np";
-				sendToPipe(commandString);
+				sendToPipe(str(boost::format("p\\npausing_keep_force loadlist \\\"%s\\\"") %playLists->filePath));
+				sendToPipe(str(boost::format("pausing_keep_force pt_step %i\\np") %(songs.size()-1)));
 				playing=true;
 				paused=false;
 				break;
@@ -385,9 +373,7 @@ void makeMusicPage(void)
 	artHite=songsHite;
 
 //start mplayer
-	commandString="";
-	commandString+="mplayer -quiet -slave -input file='" + musicFifoName + "' -idle >'" + outName + "' 2>/dev/null &";
-	system(commandString.c_str());
+	system(str(boost::format("mplayer -quiet -slave -input file='%s' -idle >'%s' 2>/dev/null &") %musicFifoName %outName).c_str());
 
 	mainApp->colours.fancyGadgets=true;
 	mainApp->colours.boxType=NOBOX;
