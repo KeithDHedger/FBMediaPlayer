@@ -1,17 +1,17 @@
 # FBMediaPlayer
 Media player for Linux framebuffer/cli
 
-Requires:
-mplayer
-Boost
-Optional ( but no framebuffer images if built without )
+Requires:<br>
+mplayer<br>
+Boost<br>
+Optional ( but no framebuffer images if built without )<br>
 ImageMagick
 
-CursesToolKit available here:
+CursesToolKit available here:<br>
 https://github.com/KeithDHedger/CursesToolKit
 
-Work in progress!
+Work in progress!<br>
 Use at your own risk!
 
-Music player pretty much done.
+Music player pretty much done.<br>
 Video player to do.
