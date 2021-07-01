@@ -26,6 +26,7 @@ CTK_cursesListBoxClass		*songList;
 CTK_cursesFBImageClass		*image;
 CTK_cursesFBImageClass		*albumArt;
 CTK_cursesTextBoxClass		*nowPlaying;
+CTK_cursesProgressBarClass	*progressIndicator;
 
 const char	*musicPlayerButtons[][2]={{"Start",DATADIR "/pixmaps/MusicPlayer/start.png"},
 {"Prev",DATADIR "/pixmaps/MusicPlayer/prev.png"},
@@ -85,22 +86,26 @@ void sendToPipe(const std::string command)
 	system(buffer.c_str());
 }
 
+double oldval=0.0;
+
 void getMeta(void)
 {
 	std::string album="";
 	std::string title="";
 	std::string artist="";
+	std::string percent="";
+	std::string songlen="";
 	std::string all="";
 
 	if((playing==false) || (paused==true) || (doQuitMusic==true))
 		return;
 
-	//commandString="get_property path\\nget_file_name\\nget_meta_album\\nget_meta_title\\nget_meta_artist";
-	sendToPipe("get_property path\\nget_file_name\\nget_meta_album\\nget_meta_title\\nget_meta_artist");
+//	sendToPipe("get_property path\\nget_file_name\\nget_meta_album\\nget_meta_title\\nget_meta_artist\\nget_percent_pos");
+	sendToPipe("get_property path\\nget_file_name\\nget_meta_album\\nget_meta_title\\nget_meta_artist\\nget_time_pos\\nget_time_length");
 
-	std::vector<std::string> lines=runApplication(str(boost::format("tail -n5 '%s'") %outName));
+	std::vector<std::string> lines=runApplication(str(boost::format("tail -n7 '%s'") %outName));
 
-	if(lines.size()==6)
+	if(lines.size()==8)
 		{
 			if(lines.at(0).find("ANS_path=") != 0)
 				return;
@@ -113,12 +118,24 @@ void getMeta(void)
 		folder.remove_filename();
 	folder+="/folder.jpg";
 
+//fprintf(stderr,"%i:%i\n",(int)140.0/60,(int)140.0%60);
 	if(oldfile!=NULL)
 		{
 			if(lines.at(0).compare(oldfile)==0)
 				{
+					percent=lines.at(5).substr(lines.at(5).find("=")+1,lines.at(5).length()-lines.at(5).find("="));
+					progressIndicator->CTK_setValue(std::stod(percent));
+					if(oldval!=std::stod(percent))
+						{
+							oldval=std::stod(percent);
+							progressIndicator->CTK_drawGadget(false);
+						}
 					while(updated==false)
 						{
+							songlen=lines.at(6).substr(lines.at(6).find("=")+1,lines.at(6).length()-lines.at(6).find("="));
+							progressIndicator->CTK_setMaxValue(std::stod(songlen));
+							progressIndicator->CTK_drawGadget(false);
+						
 							album=lines.at(2).substr(lines.at(2).find("='")+2,lines.at(2).length()-lines.at(2).find("='")-3);
 							title=lines.at(3).substr(lines.at(3).find("='")+2,lines.at(3).length()-lines.at(3).find("='")-3);
 							artist=lines.at(4).substr(lines.at(4).find("='")+2,lines.at(4).length()-lines.at(4).find("='")-3);
@@ -252,6 +269,48 @@ bool controlsCB(void *inst,void *userdata)
 	return(true);
 }
 
+bool pagekeyCB(CTK_mainAppClass *app,void *userdata)
+{
+	if(app->readKey->inputBuffer.length()!=0)
+		{
+			switch(app->readKey->specialKeyName)
+				{
+					case CTK_KEY_PAGEUP:
+						sendToPipe("seek +30");
+						return(true);
+						break;
+					case CTK_KEY_PAGEDOWN:
+						sendToPipe("seek -30");
+						return(true);
+						break;
+				}
+
+			switch(toupper(app->readKey->inputBuffer.at(0)))
+				{
+					case ' ':
+						controlsCB(NULL,(void*)PAUSE);
+						break;
+					case 'Q':
+						controlsCB(NULL,(void*)QUIT);
+						break;
+					case 'N':
+						controlsCB(NULL,(void*)NEXT);
+						break;
+					case 'P':
+						controlsCB(NULL,(void*)PREVIOUS);
+						break;
+					case 'S':
+						controlsCB(NULL,(void*)STOP);
+						break;
+					default:
+						return(false);
+				}
+		}
+	else
+		return(false);
+	return(true);
+}
+
 bool playListsCB(void *inst,void *userdata)
 {
 	CTK_cursesChooserClass	*ch=static_cast<CTK_cursesChooserClass*>(inst);
@@ -362,11 +421,14 @@ void makeMusicPage(void)
 //playlists
 	mainApp->CTK_addPage();
 
+//keyboard control
+	mainApp->pages[mainApp->pageNumber].pageKey=pagekeyCB;
+
 	midWay=mainApp->maxCols/2;
 	dialogWidth=mainApp->maxCols-4;
 	chooserWidth=((mainApp->maxCols/8)*5)-2;
 	chooserHite=mainApp->maxRows-16;
-	controlsSY=mainApp->maxRows-5;
+	controlsSY=mainApp->maxRows-4;
 	songsWidth=mainApp->maxCols-chooserWidth-7;
 	songsHite=(chooserHite+4)/2;
 	artSY=songsHite+4;
@@ -393,6 +455,12 @@ void makeMusicPage(void)
 
 	nowPlaying=mainApp->CTK_addNewTextBox(3,chooserHite+4,chooserWidth,3,"");
 	nowPlaying->CTK_setSelectable(false);
+
+	progressIndicator=mainApp->CTK_addNewProgressBar(3,chooserHite+9,mainApp->maxCols-4,0.0,100.0,0.0);
+	progressIndicator->CTK_setFillStyle(BAR);
+	progressIndicator->CTK_setShowValues(SHOWGAUGE);
+	progressIndicator->CTK_setShowRealValue(false);
+	progressIndicator->CTK_setShowValuesAsTime(true);
 
 	btnnumx=1;
 	for(int j=0;j<CONTROLCNT;j++)

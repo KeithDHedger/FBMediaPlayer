@@ -56,3 +56,5 @@ FBMediaPlayer/app/fbmediaplayer
 *.BAK
 FBMediaPlayer/resources/FBMediaPlayer/
 config.h
+FBMediaPlayer/src/html
+FBMediaPlayer/src/searchdata.xml

@@ -24,5 +24,6 @@
 #include "globals.h"
 
 bool buttonselectCB(void *inst,void *userdata);
+bool pagekeyCB(CTK_mainAppClass *app,void *userdata);
 
 #endif
