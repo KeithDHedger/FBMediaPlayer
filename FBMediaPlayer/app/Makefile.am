@@ -12,7 +12,7 @@ bin_PROGRAMS = fbmediaplayer
 
 install-exec-hook:
 	mkdir -vp "$(DESTDIR)${pkgdatadir}"
-	cp -r ../resources/pixmaps/* "$(DESTDIR)${pkgdatadir}"
+	cp -r ../resources/pixmaps "$(DESTDIR)${pkgdatadir}"
 
 
 

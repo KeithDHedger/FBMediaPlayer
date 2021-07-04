@@ -461,6 +461,7 @@ void makeMusicPage(void)
 	progressIndicator->CTK_setShowValues(SHOWGAUGE);
 	progressIndicator->CTK_setShowRealValue(false);
 	progressIndicator->CTK_setShowValuesAsTime(true);
+	progressIndicator->CTK_setScale(0);
 
 	btnnumx=1;
 	for(int j=0;j<CONTROLCNT;j++)

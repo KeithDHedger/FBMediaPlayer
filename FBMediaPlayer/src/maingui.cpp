@@ -82,6 +82,7 @@ void makeMainPage(void)
 			yspread=4;
 			yoffset=2;
 		}
+
 //settings
 	gadget=newButtonSpread(1,mainApp->maxCols,1,mainApp->maxRows,gw,gh,2,yspread,btnnumx++,btnnumy+yoffset,buttonNames[PREFSIMAGE][int(useFBImages)],useFBImages);
 	gadget->CTK_setSelectCB(buttonselectCB,(void*)PREFSIMAGE);
