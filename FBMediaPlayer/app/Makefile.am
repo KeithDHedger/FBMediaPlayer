@@ -11,8 +11,8 @@ man1_MANS = ../resources/man/fbmediaplayer.1
 bin_PROGRAMS = fbmediaplayer
 
 install-exec-hook:
-	mkdir -vp "$(DESTDIR)${pkgdatadir}/pixmaps"
-	cp -r ../resources/pixmaps/* "$(DESTDIR)${pkgdatadir}/pixmaps/"
+	mkdir -vp "$(DESTDIR)${pkgdatadir}"
+	cp -r ../resources/pixmaps/* "$(DESTDIR)${pkgdatadir}"
 
 
 
