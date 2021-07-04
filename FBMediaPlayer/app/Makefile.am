@@ -6,10 +6,16 @@ include ../sources
 
 fbmediaplayer_SOURCES = $(COMMONSRC)
 
-scriptfilesdir = $(pkgdatadir)/scripts
-scriptfiles_SCRIPTS = ../resources/scripts/*
-
 man1_MANS = ../resources/man/fbmediaplayer.1
 
 bin_PROGRAMS = fbmediaplayer
+
+install-exec-hook:
+	mkdir -vp "$(DESTDIR)${pkgdatadir}/pixmaps"
+	cp -r ../resources/pixmaps/* "$(DESTDIR)${pkgdatadir}/pixmaps/"
+
+
+
+
+
 
