@@ -273,20 +273,30 @@ bool pagekeyCB(CTK_mainAppClass *app,void *userdata)
 {
 	if(app->readKey->inputBuffer.length()!=0)
 		{
-			switch(app->readKey->specialKeyName)
-				{
-					case CTK_KEY_PAGEUP:
-						sendToPipe("seek +30");
-						return(true);
-						break;
-					case CTK_KEY_PAGEDOWN:
-						sendToPipe("seek -30");
-						return(true);
-						break;
-				}
-
+#if 0
+			#switch(app->readKey->specialKeyName)i
+			#	{
+					#case CTK_KEY_PAGEUP:
+					#	sendToPipe("seek +30");
+					#	return(true);
+					#	break;
+					#case CTK_KEY_PAGEDOWN:
+					#	sendToPipe("seek -30");
+				#	return(true);
+				#		break;
+			#	}
+#endif
 			switch(toupper(app->readKey->inputBuffer.at(0)))
 				{
+					case 'F':
+						sendToPipe("seek +30");
+						return(true);
+                                                break;
+					case 'R':
+                                                sendToPipe("seek -30");
+                                                return(true);
+                                                break;
+
 					case ' ':
 						controlsCB(NULL,(void*)PAUSE);
 						break;
@@ -294,12 +304,15 @@ bool pagekeyCB(CTK_mainAppClass *app,void *userdata)
 						controlsCB(NULL,(void*)QUIT);
 						break;
 					case 'N':
+					case '.':
 						controlsCB(NULL,(void*)NEXT);
 						break;
 					case 'P':
+					case ',':
 						controlsCB(NULL,(void*)PREVIOUS);
 						break;
 					case 'S':
+					case 'X':
 						controlsCB(NULL,(void*)STOP);
 						break;
 					default:
