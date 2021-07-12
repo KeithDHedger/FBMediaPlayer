@@ -1,4 +1,6 @@
 0.2.1
+Minor UI tweaks to music.
+Fixed segfault on end of playlist.
 Added keyboard control to music.
 Added time index to music.
 Uploaded to github.

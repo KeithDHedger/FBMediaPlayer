@@ -40,5 +40,6 @@ void getMeta(void);
 void makeMusicPage(void);
 void runMusic(void);
 void sendToPipe(const std::string command);
+bool controlsCB(void *inst,void *userdata);
 
 #endif

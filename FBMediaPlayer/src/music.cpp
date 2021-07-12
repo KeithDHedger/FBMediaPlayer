@@ -100,11 +100,9 @@ void getMeta(void)
 	if((playing==false) || (paused==true) || (doQuitMusic==true))
 		return;
 
-//	sendToPipe("get_property path\\nget_file_name\\nget_meta_album\\nget_meta_title\\nget_meta_artist\\nget_percent_pos");
 	sendToPipe("get_property path\\nget_file_name\\nget_meta_album\\nget_meta_title\\nget_meta_artist\\nget_time_pos\\nget_time_length");
 
 	std::vector<std::string> lines=runApplication(str(boost::format("tail -n7 '%s'") %outName));
-
 	if(lines.size()==8)
 		{
 			if(lines.at(0).find("ANS_path=") != 0)
@@ -118,12 +116,22 @@ void getMeta(void)
 		folder.remove_filename();
 	folder+="/folder.jpg";
 
-//fprintf(stderr,"%i:%i\n",(int)140.0/60,(int)140.0%60);
 	if(oldfile!=NULL)
 		{
 			if(lines.at(0).compare(oldfile)==0)
 				{
 					percent=lines.at(5).substr(lines.at(5).find("=")+1,lines.at(5).length()-lines.at(5).find("="));
+					if((percent=="(null)" ))
+						{
+							playing=true;
+							controlsCB(NULL,(void*)STOP);
+							if(oldfile!=NULL)
+								free(oldfile);
+							oldfile=strdup("0xdeadbeef");
+							updated=false;
+							return;
+						}
+
 					progressIndicator->CTK_setValue(std::stod(percent));
 					if(oldval!=std::stod(percent))
 						{
@@ -225,6 +233,11 @@ bool controlsCB(void *inst,void *userdata)
 				mainApp->CTK_updateScreen(mainApp,(void*)1);
 				playing=false;
 				paused=false;
+				progressIndicator->CTK_setValue(0);
+				progressIndicator->CTK_setMinValue(0);
+				progressIndicator->CTK_setMaxValue(0);
+				updated=false;
+				mainApp->CTK_updateScreen(mainApp,NULL);
 				break;
 
 			case PAUSE:
@@ -273,30 +286,16 @@ bool pagekeyCB(CTK_mainAppClass *app,void *userdata)
 {
 	if(app->readKey->inputBuffer.length()!=0)
 		{
-#if 0
-			#switch(app->readKey->specialKeyName)i
-			#	{
-					#case CTK_KEY_PAGEUP:
-					#	sendToPipe("seek +30");
-					#	return(true);
-					#	break;
-					#case CTK_KEY_PAGEDOWN:
-					#	sendToPipe("seek -30");
-				#	return(true);
-				#		break;
-			#	}
-#endif
 			switch(toupper(app->readKey->inputBuffer.at(0)))
 				{
 					case 'F':
 						sendToPipe("seek +30");
 						return(true);
-                                                break;
+						break;
 					case 'R':
-                                                sendToPipe("seek -30");
-                                                return(true);
-                                                break;
-
+						sendToPipe("seek -30");
+						return(true);
+						break;
 					case ' ':
 						controlsCB(NULL,(void*)PAUSE);
 						break;
@@ -390,6 +389,8 @@ bool playListsCB(void *inst,void *userdata)
 		}
 	sendToPipe(commandString);
 	playing=true;
+	songList->CTK_drawGadget();
+	fflush(NULL);
 	return(true);
 }
 
@@ -444,8 +445,8 @@ void makeMusicPage(void)
 	controlsSY=mainApp->maxRows-4;
 	songsWidth=mainApp->maxCols-chooserWidth-7;
 	songsHite=(chooserHite+4)/2;
-	artSY=songsHite+4;
-	artHite=songsHite;
+	artSY=songsHite+3;
+	artHite=songsHite+2;
 
 //start mplayer
 	system(str(boost::format("mplayer -quiet -slave -input file='%s' -idle >'%s' 2>/dev/null &") %musicFifoName %outName).c_str());
@@ -475,6 +476,9 @@ void makeMusicPage(void)
 	progressIndicator->CTK_setShowRealValue(false);
 	progressIndicator->CTK_setShowValuesAsTime(true);
 	progressIndicator->CTK_setScale(0);
+	progressIndicator->CTK_setValue(0);
+	progressIndicator->CTK_setMinValue(0);
+	progressIndicator->CTK_setMaxValue(0);
 
 	btnnumx=1;
 	for(int j=0;j<CONTROLCNT;j++)
@@ -494,9 +498,9 @@ void runMusic(void)
 {
 	playLists->CTK_selectFolder(mainApp,musicFolder);
 	playLists->CTK_updateList();
-	mainApp->CTK_clearScreen();//TODO//
+	mainApp->CTK_clearScreen();
 	fflush(NULL);
-	mainApp->CTK_updateScreen(mainApp,NULL);//TODO//
+	mainApp->CTK_updateScreen(mainApp,NULL);
 	doQuitMusic=false;
 	do
 		{
