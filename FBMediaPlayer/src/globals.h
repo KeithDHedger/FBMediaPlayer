@@ -33,11 +33,9 @@
 #include <boost/format.hpp>
 #include <boost/filesystem.hpp>
 
-#include <cursesGlobals.h>
-
-#ifdef _DEBUGCODE_
 #include "debug.h"
-#endif
+
+#include <cursesGlobals.h>
 
 #include "info.h"
 #include "maingui.h"

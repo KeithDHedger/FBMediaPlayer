@@ -1,4 +1,5 @@
 0.2.1
+Added debug.h.
 Adjusted artwork size in music.
 Minor UI tweaks to music.
 Fixed segfault on end of playlist.

@@ -6,6 +6,7 @@ AM_CPPFLAGS = -I$(top_srcdir) \
 			-DLIBDIR=\""${libdir}/${PACKAGE}"\" \
 			$(CURSESTOOLKIT_CFLAGS) \
 			$(IMAGEMAGICK_CFLAGS) \
+			$(WARNDEBUG) \
 			$(USEDEBUG) \
 			$(BOOST_CPPFLAGS)
 

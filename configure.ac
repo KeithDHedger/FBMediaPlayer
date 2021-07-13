@@ -40,5 +40,16 @@ if test "$enable_debug" = "yes"; then
 	AC_SUBST(USEDEBUG)
 fi
 
+AC_MSG_CHECKING(whether to warn about debug functions)
+AC_ARG_ENABLE(warn-debug,AS_HELP_STRING([--enable-warn-debug],[Enable warn debug code]),
+    [enable_warn_debug=$enableval],
+    [enable_warn_debug="no"])
+AC_MSG_RESULT($enable_warn_debug)
+
+if test "$enable_warn_debug" = "yes"; then
+	WARNDEBUG="-D_WARN_ENABLEDEBUG_"
+	AC_SUBST(WARNDEBUG)
+fi
+
 AC_OUTPUT(Makefile FBMediaPlayer/app/Makefile)
 

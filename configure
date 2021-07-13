@@ -588,6 +588,7 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
+WARNDEBUG
 USEDEBUG
 BOOST_FILESYSTEM_LIB
 BOOST_SYSTEM_LIB
@@ -709,6 +710,7 @@ with_boost_libdir
 with_boost_system
 with_boost_filesystem
 enable_debug
+enable_warn_debug
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1354,6 +1356,7 @@ Optional Features:
   --enable-silent-rules   less verbose build output (undo: "make V=1")
   --disable-silent-rules  verbose build output (undo: "make V=0")
   --enable-debug          Enable debug code
+  --enable-warn-debug     Enable warn debug code
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -5670,6 +5673,23 @@ fi
 $as_echo "$enable_debug" >&6; }
 if test "$enable_debug" = "yes"; then
 	USEDEBUG="-D_DEBUGCODE_"
+
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to warn about debug functions" >&5
+$as_echo_n "checking whether to warn about debug functions... " >&6; }
+# Check whether --enable-warn-debug was given.
+if test "${enable_warn_debug+set}" = set; then :
+  enableval=$enable_warn_debug; enable_warn_debug=$enableval
+else
+  enable_warn_debug="no"
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_warn_debug" >&5
+$as_echo "$enable_warn_debug" >&6; }
+
+if test "$enable_warn_debug" = "yes"; then
+	WARNDEBUG="-D_WARN_ENABLEDEBUG_"
 
 fi
 

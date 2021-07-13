@@ -396,6 +396,7 @@ bool playListsCB(void *inst,void *userdata)
 
 void makeMusicPage(void)
 {
+DEBUGFUNC("%s\n",">>>>")
 	CTK_cursesGadgetClass	*gadget;
 	int						gw=mainApp->maxCols/8;
 	int						gh=gw/(fbInfo->charHeight/fbInfo->charWidth);
