@@ -35,7 +35,9 @@
 
 #include <cursesGlobals.h>
 
-#include "config.h"
+#ifdef _DEBUGCODE_
+#include "debug.h"
+#endif
 
 #include "info.h"
 #include "maingui.h"
