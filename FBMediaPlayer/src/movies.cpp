@@ -47,7 +47,7 @@ bool pagekeyVideoCB(CTK_mainAppClass *app,void *userdata)
 					case 'Q':
 						//controlsCB(NULL,(void*)QUIT);
 						doQuitVideo=true;
-						fprintf(stderr,"---->>>>\n");
+						//fprintf(stderr,"---->>>>\n");
 						break;
 //					case 'N':
 //					case '.':
@@ -75,7 +75,7 @@ bool playVideoCB(void *inst,void *userdata)
 videoList->CTK_setVisible(false);
 mainApp->CTK_clearScreen();
 doQuitVideo=false;
-fprintf(stderr,"here\n");
+//fprintf(stderr,"here\n");
 //	do
 //		{
 //			mainApp->CTK_mainEventLoop(-250,false);

@@ -50,7 +50,6 @@ bool buttonselectCB(void *inst,void *userdata)
 		{
 			case OFFIMAGE:
 				mainApp->runEventLoop=false;
-										fprintf(stderr,"---->--->>>\n");
 				break;
 			case HOMEIMAGE:
 				mainApp->CTK_setPage(MAINPAGE);
