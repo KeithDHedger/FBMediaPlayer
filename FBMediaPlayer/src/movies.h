@@ -23,6 +23,10 @@
 
 #include "globals.h"
 
+extern CTK_cursesChooserClass	*videoList;
+extern const char				*videoListFolder;
+
 void makeMoviesPage(void);
+void runVideo(void);
 
 #endif

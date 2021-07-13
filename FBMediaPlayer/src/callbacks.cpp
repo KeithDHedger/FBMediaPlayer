@@ -50,15 +50,25 @@ bool buttonselectCB(void *inst,void *userdata)
 		{
 			case OFFIMAGE:
 				mainApp->runEventLoop=false;
+										fprintf(stderr,"---->--->>>\n");
 				break;
 			case HOMEIMAGE:
 				mainApp->CTK_setPage(MAINPAGE);
 				break;
+			case TVIMAGE:
+				//mainApp->CTK_setPage(TVPAGE);
 			case FILMIMAGE:
 				mainApp->CTK_setPage(FILMPAGE);
-				break;
-			case TVIMAGE:
-				mainApp->CTK_setPage(TVPAGE);
+				videoList->CTK_setShowFileTypes(".mp4;.iso;.mpeg;.mpg;.avi;");
+				videoList->CTK_setCBUserData((void*)FILMIMAGE);
+				videoListFolder=prefsData.at(mainApp->utils->CTK_getVarEntry(prefsData,"filmpath")).charVar.c_str();
+				videoList->CTK_selectFolder(mainApp,videoListFolder);
+				videoList->CTK_updateList();
+
+				//fprintf(stderr,">>>>>>>>>>>\n");
+				//runVideo();
+				//fprintf(stderr,"<<<<<<<<<\n");
+				//mainApp->CTK_setPage(MAINPAGE);
 				break;
 
 //music	
@@ -79,7 +89,7 @@ bool buttonselectCB(void *inst,void *userdata)
 			case MUSICFILEIMAGE:
 				mainApp->CTK_setPage(PLAYLISTSPAGE);
 				playLists->files->LFSTK_setIgnoreNavLinks(false);
-				playLists->CTK_setShowFileTypes(".mp3;.flac;.m4a;");
+				playLists->CTK_setShowFileTypes(".mp3;.flac;.m4a;.mp4;");
 				playLists->CTK_setCBUserData((void*)MUSICFILEIMAGE);
 				musicFolder=prefsData.at(mainApp->utils->CTK_getVarEntry(prefsData,"musicfilespath")).charVar.c_str();
 				runMusic();

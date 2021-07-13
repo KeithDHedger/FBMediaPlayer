@@ -446,7 +446,8 @@ void makeMusicPage(void)
 	songsWidth=mainApp->maxCols-chooserWidth-7;
 	songsHite=(chooserHite+4)/2;
 	artSY=songsHite+3;
-	artHite=songsHite+2;
+	//artHite=songsHite+1;
+	artHite=(chooserHite-songsHite)+5;
 
 //start mplayer
 	system(str(boost::format("mplayer -quiet -slave -input file='%s' -idle >'%s' 2>/dev/null &") %musicFifoName %outName).c_str());
