@@ -153,7 +153,7 @@ void getMeta(void)
 
 							commandString=str(boost::format(":>'%s'") %outName);
 							system(commandString.c_str());
-							albumArt->CTK_newFBImage(chooserWidth+6,artSY,artHite*2,artHite,folder.c_str(),false);
+							albumArt->CTK_newFBImage(chooserWidth+5,artSY,artHite*2,artHite,folder.c_str(),false);
 							mainApp->CTK_updateScreen(mainApp,NULL);
 						}
 					commandString=str(boost::format(":>'%s'") %outName);
@@ -396,7 +396,6 @@ bool playListsCB(void *inst,void *userdata)
 
 void makeMusicPage(void)
 {
-DEBUGFUNC("%s\n",">>>>")
 	CTK_cursesGadgetClass	*gadget;
 	int						gw=mainApp->maxCols/8;
 	int						gh=gw/(fbInfo->charHeight/fbInfo->charWidth);
