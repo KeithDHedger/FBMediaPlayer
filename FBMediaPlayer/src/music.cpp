@@ -153,7 +153,10 @@ void getMeta(void)
 
 							commandString=str(boost::format(":>'%s'") %outName);
 							system(commandString.c_str());
+
 							albumArt->CTK_newFBImage(chooserWidth+5,artSY,artHite*2,artHite,folder.c_str(),false);
+							songList->CTK_selectItem(songList->CTK_findByLabel(lines.at(1).substr(lines.at(1).find("='")+2,lines.at(1).length()-lines.at(1).find("='")-3)));
+mainApp->CTK_setDefaultGadget(songList);
 							mainApp->CTK_updateScreen(mainApp,NULL);
 						}
 					commandString=str(boost::format(":>'%s'") %outName);
