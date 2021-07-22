@@ -117,12 +117,12 @@ void makeMoviesPage(void)
 	videoChooserWidth=((mainApp->maxCols/8)*5)-2;
 	videoChooserHite=mainApp->maxRows-16;
 
-	mainApp->colours.fancyGadgets=true;
-	mainApp->colours.boxType=NOBOX;
-	mainApp->colours.textBoxType=INBOX;
-	mainApp->colours.windowBackCol=BACK_WHITE;
-	mainApp->colours.backCol=BACK_WHITE;
-	mainApp->colours.foreCol=FORE_BLACK;
+//	mainApp->colours.fancyGadgets=true;
+//	mainApp->colours.boxType=NOBOX;
+//	mainApp->colours.textBoxType=INBOX;
+//	mainApp->colours.windowBackCol=BACK_WHITE;
+//	mainApp->colours.backCol=BACK_WHITE;
+//	mainApp->colours.foreCol=FORE_BLACK;
 	videoList=new CTK_cursesChooserClass(mainApp,3,2,videoChooserWidth,videoChooserHite);
 	videoList->CTK_setShowTypes(ANYTYPE);
 	videoList->CTK_setShowHidden(false);

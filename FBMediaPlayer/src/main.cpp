@@ -84,10 +84,10 @@ int main(int argc, char **argv)
 
 	mainApp=new CTK_mainAppClass();
 	fbInfo=mainApp->CTK_getFBData();
-	coloursStruct cs=mainApp->colours;
-	cs.inputBoxType=INBOX;
-	cs.fancyGadgets=true;
-	mainApp->CTK_setColours(&cs,true);
+	//coloursStruct cs=mainApp->colours;
+	//cs.inputBoxType=INBOX;
+	//cs.fancyGadgets=true;
+	//mainApp->CTK_setColours(&cs,true);
 
 //	fprintf(stderr,"cols=%i rows=%i fbwidth=%i fbhite=%i fbcharw=%i fbcharh=%i inatty=%i datadir=%s\n",mainApp->maxCols,mainApp->maxRows,fbInfo->screenWidth,fbInfo->screenHeight,fbInfo->charWidth,fbInfo->charHeight,isatty(fileno(stdout)),DATADIR);
 

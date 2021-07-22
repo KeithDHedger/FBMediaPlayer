@@ -454,12 +454,12 @@ void makeMusicPage(void)
 //start mplayer
 	system(str(boost::format("mplayer -quiet -slave -input file='%s' -idle >'%s' 2>/dev/null &") %musicFifoName %outName).c_str());
 
-	mainApp->colours.fancyGadgets=true;
-	mainApp->colours.boxType=NOBOX;
-	mainApp->colours.textBoxType=INBOX;
-	mainApp->colours.windowBackCol=BACK_WHITE;
-	mainApp->colours.backCol=BACK_WHITE;
-	mainApp->colours.foreCol=FORE_BLACK;
+	//mainApp->colours.fancyGadgets=true;
+	//mainApp->colours.boxType=NOBOX;
+	//mainApp->colours.textBoxType=INBOX;
+	//mainApp->colours.windowBackCol=BACK_WHITE;
+	//mainApp->colours.backCol=BACK_WHITE;
+	//mainApp->colours.foreCol=FORE_BLACK;
 	playLists=new CTK_cursesChooserClass(mainApp,3,2,chooserWidth,chooserHite);
 	playLists->CTK_setShowTypes(ANYTYPE);
 	playLists->CTK_setShowHidden(false);
@@ -482,6 +482,7 @@ void makeMusicPage(void)
 	progressIndicator->CTK_setValue(0);
 	progressIndicator->CTK_setMinValue(0);
 	progressIndicator->CTK_setMaxValue(0);
+	progressIndicator->gadgetColours.backCol=mainApp->windowColours.backCol;
 
 	btnnumx=1;
 	for(int j=0;j<CONTROLCNT;j++)
@@ -493,7 +494,7 @@ void makeMusicPage(void)
 				gadget->CTK_setSelectCB(controlsCB,(void*)btnnumx++);
 		}
 
-	albumArt=mainApp->CTK_addNewFBImage(chooserWidth+6,artSY,artHite,artHite,NULL,false);
+	albumArt=mainApp->CTK_addNewFBImage(chooserWidth+7,artSY,artHite,artHite,NULL,false);
 	albumArt->CTK_setSelectable(false);
 }
 
