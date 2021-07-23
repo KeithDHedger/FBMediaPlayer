@@ -482,7 +482,7 @@ void makeMusicPage(void)
 	progressIndicator->CTK_setValue(0);
 	progressIndicator->CTK_setMinValue(0);
 	progressIndicator->CTK_setMaxValue(0);
-	progressIndicator->gadgetColours.backCol=mainApp->windowColours.backCol;
+	//progressIndicator->gadgetColours.backCol=mainApp->windowColours.backCol;
 
 	btnnumx=1;
 	for(int j=0;j<CONTROLCNT;j++)
