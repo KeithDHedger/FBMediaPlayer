@@ -1,4 +1,5 @@
 0.2.1
+Added resume playback of last song/playlist,
 Updated for new ctktoolkit version.
 Added debug.h.
 Adjusted artwork size in music.

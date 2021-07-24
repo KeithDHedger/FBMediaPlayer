@@ -88,6 +88,79 @@ void sendToPipe(const std::string command)
 
 double oldval=0.0;
 
+bool playListsCB(void *inst,void *userdata)
+{
+	CTK_cursesChooserClass	*ch=static_cast<CTK_cursesChooserClass*>(inst);
+	FILE					*fd=NULL;
+	char					buffer[PATH_MAX];
+	char					buffer2[PATH_MAX];
+
+
+	if((ch->files->data[ch->lb->listItemNumber].fileType==FOLDERTYPE) || (ch->files->data[ch->lb->listItemNumber].fileType==FILELINKTYPE))
+		return(true);
+	playListFolder=ch->folderPath.c_str();
+	for(int j=0;j<songs.size();j++)
+		free(songs[j]);
+	songs.clear();
+	songList->CTK_clearList();
+
+	if(ch->CTK_getCBUserData()==(void*)MUSICFILEIMAGE)
+		{
+			sprintf(buffer,": > '%s'",tempPlaylist);
+			system(buffer);
+			for(int j=ch->lb->listItemNumber;j<ch->lb->listItems.size();j++)
+				{
+					sprintf(buffer2,"%s/%s",playListFolder,ch->lb->listItems.at(j)->label.c_str());
+					songs.push_back(strdup(buffer2));
+					sprintf(buffer,"echo -e '%s' >> '%s'",buffer2,tempPlaylist);
+					system(buffer);
+				}
+			playLists->filePath=tempPlaylist;
+		}
+	else
+		{
+			fd=fopen(ch->filePath.c_str(),"r");
+			if(fd!=NULL)
+				{
+					while(feof(fd)==0)
+						{
+							buffer[0]=0;
+							fgets(buffer,2048,fd);
+							if(strlen(buffer)>0)
+								{
+									buffer[strlen(buffer)-1]=0;
+									sprintf(buffer2,"%s/%s",playListFolder,buffer);
+									songs.push_back(strdup(buffer2));
+								}
+						}
+					fclose(fd);
+				}
+		}
+
+	for(long j=0;j<songs.size();j++)
+		{
+			char	*ptr=strrchr(songs[j],'/');
+			songList->CTK_addListItem(++ptr,(void*)j);
+		}
+
+	commandString="loadlist '";
+	if(ch->CTK_getCBUserData()==(void*)MUSICFILEIMAGE)
+		{
+			commandString+=tempPlaylist;
+			commandString+="'";
+		}
+	else
+		{
+			commandString+=ch->filePath + "'";
+		}
+
+	sendToPipe(commandString);
+	playing=true;
+	songList->CTK_drawGadget();
+	fflush(NULL);
+	return(true);
+}
+
 void getMeta(void)
 {
 	std::string album="";
@@ -189,6 +262,70 @@ bool selectSongCB(void *inst,void *userdata)
 	return(true);
 }
 
+void getLastPlayed(void)
+{
+	varsStruct				vsplaylistitem;
+	varsStruct				vsitem;
+	std::vector<varsStruct> invars;
+	std::string				filepath;
+	int						itemnum;
+
+	filepath=getenv("HOME");
+	filepath+="/.FBMediaPlayer";
+	mkdir(filepath.c_str(),0700);
+	filepath+="/lastmusicplayed.rc";
+
+	invars=mainApp->utils->CTK_loadVars(filepath.c_str());
+	if(invars.empty())
+		return;
+
+	vsplaylistitem=mainApp->utils->CTK_findVar(invars,"playlist");
+	if(vsplaylistitem.vType==BADTYPE)
+		return;
+	vsitem=mainApp->utils->CTK_findVar(invars,"song");
+	if(vsitem.vType==BADTYPE)
+		return;
+	itemnum=playLists->lb->CTK_findByLabel(vsplaylistitem.charVar);
+
+	if(itemnum==-1)
+		return;
+	playLists->lb->CTK_selectItem(itemnum);
+	playLists->fileName=playLists->files->data[itemnum].name;
+	playLists->filePath=playLists->files->data[itemnum].path;
+	playListsCB(playLists,(void*)PLAYLISTIMAGE);
+	itemnum=songList->CTK_findByLabel(vsitem.charVar);
+	if(itemnum==-1)
+		return;
+	songList->CTK_selectItem(itemnum);
+	selectSongCB(songList,NULL);
+}
+
+void setLastPlayed(void)
+{
+	varsStruct				vsitem;
+	std::vector<varsStruct> outvars;
+	std::string				filepath;
+
+	vsitem.vType=CHARVAR;
+	if((songList->listItems.empty()) || (songList->CTK_getActiveItem()==-1))
+		return;
+	vsitem.charVar=songList->listItems.at(songList->CTK_getActiveItem())->label;
+	vsitem.varName="song";
+	outvars.push_back(vsitem);
+
+	vsitem.vType=CHARVAR;
+	vsitem.charVar=playLists->fileName;
+	vsitem.varName="playlist";
+	outvars.push_back(vsitem);
+
+	filepath=getenv("HOME");
+	filepath+="/.FBMediaPlayer";
+	mkdir(filepath.c_str(),0700);
+	filepath+="/lastmusicplayed.rc";
+
+	mainApp->utils->CTK_saveVars(filepath.c_str(),outvars);
+}
+
 bool controlsCB(void *inst,void *userdata)
 {
 	long	ud=(long)userdata;
@@ -230,6 +367,7 @@ bool controlsCB(void *inst,void *userdata)
 				sendToPipe("stop");
 				albumArt->CTK_newFBImage(chooserWidth+6,artSY,artHite*2,artHite,"",false);
 				nowPlaying->CTK_updateText("");
+				playLists->lb->activeItem=-1;
 				mainApp->CTK_setDefaultGadget(playLists->lb);
 				mainApp->CTK_clearScreen();
 				mainApp->CTK_updateScreen(mainApp,(void*)1);
@@ -238,6 +376,7 @@ bool controlsCB(void *inst,void *userdata)
 				progressIndicator->CTK_setValue(0);
 				progressIndicator->CTK_setMinValue(0);
 				progressIndicator->CTK_setMaxValue(0);
+				progressIndicator->CTK_drawGadget();
 				updated=false;
 				mainApp->CTK_updateScreen(mainApp,NULL);
 				break;
@@ -266,19 +405,23 @@ bool controlsCB(void *inst,void *userdata)
 				break;
 
 			case QUIT:
+				setLastPlayed();
 				for(int j=0;j<songs.size();j++)
 					free(songs[j]);
 				songs.clear();
 				songList->CTK_clearList();
+				playLists->lb->activeItem=-1;
 				sendToPipe("stop");
 				albumArt->CTK_newFBImage(chooserWidth+6,artSY,artHite*2,artHite,"",false);
 				nowPlaying->CTK_updateText("");
-				mainApp->CTK_setDefaultGadget(playLists->lb);
-				mainApp->CTK_clearScreen();
-				mainApp->CTK_updateScreen(mainApp,(void*)1);
 				playing=false;
 				paused=false;
 				doQuitMusic=true;
+				progressIndicator->CTK_setValue(0);
+				progressIndicator->CTK_setMinValue(0);
+				progressIndicator->CTK_setMaxValue(0);
+				progressIndicator->CTK_drawGadget();
+				fflush(NULL);
 				break;
 		}
 	return(true);
@@ -322,77 +465,6 @@ bool pagekeyCB(CTK_mainAppClass *app,void *userdata)
 		}
 	else
 		return(false);
-	return(true);
-}
-
-bool playListsCB(void *inst,void *userdata)
-{
-	CTK_cursesChooserClass	*ch=static_cast<CTK_cursesChooserClass*>(inst);
-	FILE					*fd=NULL;
-	char					buffer[PATH_MAX];
-	char					buffer2[PATH_MAX];
-
-	if((ch->files->data[ch->lb->listItemNumber].fileType==FOLDERTYPE) || (ch->files->data[ch->lb->listItemNumber].fileType==FILELINKTYPE))
-		return(true);
-	playListFolder=ch->folderPath.c_str();
-	for(int j=0;j<songs.size();j++)
-		free(songs[j]);
-	songs.clear();
-	songList->CTK_clearList();
-
-	if(ch->CTK_getCBUserData()==(void*)MUSICFILEIMAGE)
-		{
-			sprintf(buffer,": > '%s'",tempPlaylist);
-			system(buffer);
-			for(int j=ch->lb->listItemNumber;j<ch->lb->listItems.size();j++)
-				{
-					sprintf(buffer2,"%s/%s",playListFolder,ch->lb->listItems.at(j)->label.c_str());
-					songs.push_back(strdup(buffer2));
-					sprintf(buffer,"echo -e '%s' >> '%s'",buffer2,tempPlaylist);
-					system(buffer);
-				}
-			playLists->filePath=tempPlaylist;
-		}
-	else
-		{
-			fd=fopen(ch->filePath.c_str(),"r");
-			if(fd!=NULL)
-				{
-					while(feof(fd)==0)
-						{
-							buffer[0]=0;
-							fgets(buffer,2048,fd);
-							if(strlen(buffer)>0)
-								{
-									buffer[strlen(buffer)-1]=0;
-									sprintf(buffer2,"%s/%s",playListFolder,buffer);
-									songs.push_back(strdup(buffer2));
-								}
-						}
-					fclose(fd);
-				}
-		}
-
-	for(long j=0;j<songs.size();j++)
-		{
-			char	*ptr=strrchr(songs[j],'/');
-			songList->CTK_addListItem(++ptr,(void*)j);
-		}
-
-	commandString="loadlist '";
-	if(ch->CTK_getCBUserData()==(void*)MUSICFILEIMAGE)
-		{
-			commandString+=tempPlaylist;
-			commandString+="'";
-		}
-	else
-		{
-			commandString+=ch->filePath + "'";
-		}
-	sendToPipe(commandString);
-	playing=true;
-	songList->CTK_drawGadget();
-	fflush(NULL);
 	return(true);
 }
 
@@ -482,7 +554,6 @@ void makeMusicPage(void)
 	progressIndicator->CTK_setValue(0);
 	progressIndicator->CTK_setMinValue(0);
 	progressIndicator->CTK_setMaxValue(0);
-	//progressIndicator->gadgetColours.backCol=mainApp->windowColours.backCol;
 
 	btnnumx=1;
 	for(int j=0;j<CONTROLCNT;j++)
@@ -502,6 +573,7 @@ void runMusic(void)
 {
 	playLists->CTK_selectFolder(mainApp,musicFolder);
 	playLists->CTK_updateList();
+	getLastPlayed();
 	mainApp->CTK_clearScreen();
 	fflush(NULL);
 	mainApp->CTK_updateScreen(mainApp,NULL);

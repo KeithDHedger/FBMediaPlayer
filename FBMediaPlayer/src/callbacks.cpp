@@ -82,7 +82,12 @@ bool buttonselectCB(void *inst,void *userdata)
 				playLists->CTK_setCBUserData((void*)PLAYLISTIMAGE);
 				musicFolder=prefsData.at(mainApp->utils->CTK_getVarEntry(prefsData,"musicplaylistpath")).charVar.c_str();
 				runMusic();
+				system("clear");
 				mainApp->CTK_setPage(MUSICPAGE);
+				mainApp->CTK_clearScreen();
+				mainApp->CTK_updateScreen(mainApp,NULL);
+				fflush(NULL);
+
 				break;
 
 			case MUSICFILEIMAGE:
