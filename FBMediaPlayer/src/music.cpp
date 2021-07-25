@@ -99,6 +99,7 @@ bool playListsCB(void *inst,void *userdata)
 	if((ch->files->data[ch->lb->listItemNumber].fileType==FOLDERTYPE) || (ch->files->data[ch->lb->listItemNumber].fileType==FILELINKTYPE))
 		return(true);
 	playListFolder=ch->folderPath.c_str();
+	songList->CTK_setItem(0xdeadbeef,false);
 	for(int j=0;j<songs.size();j++)
 		free(songs[j]);
 	songs.clear();
@@ -358,6 +359,7 @@ bool controlsCB(void *inst,void *userdata)
 				break;
 
 			case STOP:
+				setLastPlayed();
 				if(playing==false)
 					return(true);
 				for(int j=0;j<songs.size();j++)
@@ -520,18 +522,11 @@ void makeMusicPage(void)
 	songsWidth=mainApp->maxCols-chooserWidth-7;
 	songsHite=(chooserHite+4)/2;
 	artSY=songsHite+3;
-	//artHite=songsHite+1;
 	artHite=(chooserHite-songsHite)+5;
 
 //start mplayer
 	system(str(boost::format("mplayer -quiet -slave -input file='%s' -idle >'%s' 2>/dev/null &") %musicFifoName %outName).c_str());
 
-	//mainApp->colours.fancyGadgets=true;
-	//mainApp->colours.boxType=NOBOX;
-	//mainApp->colours.textBoxType=INBOX;
-	//mainApp->colours.windowBackCol=BACK_WHITE;
-	//mainApp->colours.backCol=BACK_WHITE;
-	//mainApp->colours.foreCol=FORE_BLACK;
 	playLists=new CTK_cursesChooserClass(mainApp,3,2,chooserWidth,chooserHite);
 	playLists->CTK_setShowTypes(ANYTYPE);
 	playLists->CTK_setShowHidden(false);

@@ -21,7 +21,7 @@
 #ifndef _DEBUGH_
 #define _DEBUGH_
 
-#ifdef _DEBUGCODE_
+#ifdef _DEBUGCODEFB_
 #include <stdarg.h>
 
 __attribute__((unused)) static bool	showFileData=true;
@@ -108,7 +108,7 @@ __attribute__((unused)) static void simpleDebug(const char *file,const char *fun
 #define DEBUGFUNC(x,...) debugFunc(__FILE__,__func__,__LINE__,(const char*)x,__VA_ARGS__);
 #define DEBUG simpleDebug(__FILE__,__func__,__LINE__);
 #else
-#ifdef _WARN_ENABLEDEBUG_
+#ifdef _WARN_ENABLEDEBUGFB_
 #define DEBUGFUNC(...) fprintf(stderr,"Remove debug code here: %s:%i\n",__FILE__,__LINE__);
 #define DEBUG fprintf(stderr,"Remove debug code here: %s:%i\n",__FILE__,__LINE__);
 #else

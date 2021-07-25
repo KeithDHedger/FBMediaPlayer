@@ -4453,7 +4453,7 @@ fi
 
 
 
-CURSESTOOLKIT_MODULES="cursestoolkit >= 2.0.1"
+CURSESTOOLKIT_MODULES="cursestoolkit >= 3.0.0"
 
 
 
@@ -5574,7 +5574,7 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_debug" >&5
 $as_echo "$enable_debug" >&6; }
 if test "$enable_debug" = "yes"; then
-	USEDEBUG="-D_DEBUGCODE_"
+	USEDEBUG="-D_DEBUGCODEFB_"
 
 fi
 
@@ -5591,7 +5591,7 @@ fi
 $as_echo "$enable_warn_debug" >&6; }
 
 if test "$enable_warn_debug" = "yes"; then
-	WARNDEBUG="-D_WARN_ENABLEDEBUG_"
+	WARNDEBUG="-D_WARN_ENABLEDEBUGFB_"
 
 fi
 

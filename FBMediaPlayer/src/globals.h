@@ -33,9 +33,11 @@
 #include <boost/format.hpp>
 #include <boost/filesystem.hpp>
 
-#include "debug.h"
-
 #include <cursesGlobals.h>
+
+#if defined _DEBUGCODEFB_ || defined _WARN_ENABLEDEBUGFB_
+#include "debug.h"
+#endif
 
 #include "info.h"
 #include "maingui.h"
