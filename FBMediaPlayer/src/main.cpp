@@ -43,7 +43,6 @@ void printHelp()
 
 int main(int argc, char **argv)
 {
-DEBUG
 	while (1)
 		{
 			int	c;
