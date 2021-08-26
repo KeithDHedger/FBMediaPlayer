@@ -545,6 +545,8 @@ void makeMusicPage(void)
 	progressIndicator->CTK_setShowValues(SHOWGAUGE);
 	progressIndicator->CTK_setShowRealValue(false);
 	progressIndicator->CTK_setShowValuesAsTime(true);
+	progressIndicator->CTK_setTimeFormat(false,true,true);
+	
 	progressIndicator->CTK_setScale(0);
 	progressIndicator->CTK_setValue(0);
 	progressIndicator->CTK_setMinValue(0);
