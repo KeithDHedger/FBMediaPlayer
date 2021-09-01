@@ -63,11 +63,14 @@ bool buttonselectCB(void *inst,void *userdata)
 				videoListFolder=prefsData.at(mainApp->utils->CTK_getVarEntry(prefsData,"filmpath")).charVar.c_str();
 				videoList->CTK_selectFolder(mainApp,videoListFolder);
 				videoList->CTK_updateList();
+				mainApp->CTK_updateScreen(mainApp,NULL);
+				fflush(NULL);
 
-				//fprintf(stderr,">>>>>>>>>>>\n");
-				//runVideo();
-				//fprintf(stderr,"<<<<<<<<<\n");
-				//mainApp->CTK_setPage(MAINPAGE);
+				fprintf(stderr,">>>>>>>>>>>\n");
+				runVideo();
+				fprintf(stderr,"<<<<<<<<<\n");
+				mainApp->CTK_setPage(MAINPAGE);
+				mainApp->CTK_updateScreen(mainApp,NULL);
 				break;
 
 //music	
