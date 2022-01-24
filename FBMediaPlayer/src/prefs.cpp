@@ -25,7 +25,15 @@ std::vector<varsStruct>		prefsData={
 {"tvpath",CHARVAR,-1,false,-1,getenv("HOME") + std::string("/Videos")},
 {"musicplaylistpath",CHARVAR,-1,false,-1,getenv("HOME") + std::string("/Music")},
 {"musicfilespath",CHARVAR,-1,false,-1,getenv("HOME") + std::string("/Music")},
-{"backdroppath",CHARVAR,-1,false,-1,getenv("HOME") + std::string("/Wallpapers")}
+{"backdroppath",CHARVAR,-1,false,-1,getenv("HOME") + std::string("/Wallpapers")},
+{"keypause",CHARVAR,-1,false,-1," "},
+{"keystop",CHARVAR,-1,false,-1,"x"},
+{"keyquit",CHARVAR,-1,false,-1,"q"},
+{"keyfoward",CHARVAR,-1,false,-1,"f"},
+{"keyreverse",CHARVAR,-1,false,-1,"r"},
+{"keynext",CHARVAR,-1,false,-1,"."},
+{"keyprev",CHARVAR,-1,false,-1,","},
+{"keycontrol",CHARVAR,-1,false,-1,"\n"}
 };
 std::string					prefsPath;
 
@@ -72,7 +80,7 @@ void makePrefsPage(void)
 	else
 		mainApp->utils->CTK_saveVars(prefsPath.c_str(),prefsData);
 
-//mainApp->utils->CTK_saveVars("2",prefsData);
+mainApp->utils->CTK_saveVars("/tmp/2",prefsData);
 
 	if(useFBImages==false)
 		gw=10;

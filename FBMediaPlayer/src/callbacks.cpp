@@ -52,6 +52,7 @@ bool buttonselectCB(void *inst,void *userdata)
 				mainApp->runEventLoop=false;
 				break;
 			case HOMEIMAGE:
+				//mainApp->runEventLoop=true;
 				mainApp->CTK_setPage(MAINPAGE);
 				break;
 			case TVIMAGE:
@@ -66,9 +67,7 @@ bool buttonselectCB(void *inst,void *userdata)
 				mainApp->CTK_updateScreen(mainApp,NULL);
 				fflush(NULL);
 
-				fprintf(stderr,">>>>>>>>>>>\n");
 				runVideo();
-				fprintf(stderr,"<<<<<<<<<\n");
 				mainApp->CTK_setPage(MAINPAGE);
 				mainApp->CTK_updateScreen(mainApp,NULL);
 				break;

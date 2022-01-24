@@ -20,6 +20,8 @@
  
 #include "movies.h"
 
+
+
 CTK_cursesChooserClass		*videoList;
 const char					*videoListFolder="./";
 int							videoMidWay;
@@ -30,241 +32,518 @@ int							movieControlsSY;
 bool						vplaying=false;
 bool						vpaused=false;
 
-const char	*moviePlayerButtons[][2]={{"Start",DATADIR "/pixmaps/MusicPlayer/start.png"},
-{"Prev",DATADIR "/pixmaps/MusicPlayer/prev.png"},
-{"Play",DATADIR "/pixmaps/MusicPlayer/play.png"},
+
+const char	*moviePlayerButtons[][2]={{"Play",DATADIR "/pixmaps/MusicPlayer/pause.png"},
 {"Stop",DATADIR "/pixmaps/MusicPlayer/stop.png"},
-{"Pause",DATADIR "/pixmaps/MusicPlayer/pause.png"},
-{"Next",DATADIR "/pixmaps/MusicPlayer/next.png"},
-{"Last",DATADIR "/pixmaps/MusicPlayer/end.png"},
 {"Quit",DATADIR "/pixmaps/MusicPlayer/quit.png"},
+{"Next",DATADIR "/pixmaps/MusicPlayer/next.png"},
+{"Prev",DATADIR "/pixmaps/MusicPlayer/prev.png"},
 };
 
-void sendToMoviePipe(const std::string command)
+//void sendToMoviePipe(const std::string command)
+//{
+//	std::string	buffer="echo -e \"";
+//	buffer+=command + "\" >\"" + videoFifoName + "\" &";
+//	std::cerr << buffer << std::endl;
+//	system(buffer.c_str());
+//}
+
+
+void sendToVideoPipe(const std::string command)
 {
 	std::string	buffer="echo -e \"";
 	buffer+=command + "\" >\"" + videoFifoName + "\" &";
-	std::cerr << buffer << std::endl;
 	system(buffer.c_str());
+}
+
+bool	isPaused=false;
+bool	ignoreNL=false;
+
+void mainloopCB(void *mainc,void *data)
+{
+	if(ignoreNL==true)
+		{
+			//ignoreNL=false;
+			return;
+		}
+	
+	CTK_mainAppClass *mp=(CTK_mainAppClass *)mainc;
+	if((mp->readKey->isHexString==true) && (mp->readKey->specialKeyName==CTK_KEY_RETURN))
+		{
+			sendToVideoPipe("pause");
+			isPaused=!isPaused;
+			if(isPaused==true)
+				ignoreNL=false;
+		}
+//	else
+//		{
+//			const char	*keeppause="";
+//			if(isPaused==true)
+//				keeppause="\npause";
+//
+//			//fprintf(stderr,">>%s<<\n",mp->readKey->inputBuffer.c_str());
+////			if(mp->readKey->inputBuffer.compare("q")==0)
+////				{
+////					sendToVideoPipe("quit");
+////					vplaying=false;
+////				}
+////			if(mp->readKey->inputBuffer.compare("s")==0)
+////				{
+////					sendToVideoPipe("stop");
+////					vplaying=false;
+////				}
+////			if(mp->readKey->inputBuffer.compare(">")==0)
+////				{
+////					sendToVideoPipe("seek +60.0" + std::string(keeppause));
+////				}
+////			if(mp->readKey->inputBuffer.compare("<")==0)
+////				{
+////					sendToVideoPipe("seek -60.0" + std::string(keeppause));
+////				}
+//		}
 }
 
 bool moviesControlsCB(void *inst,void *userdata)
 {
 	long	ud=(long)userdata;
 
-	switch(ud)
-		{
-//			case START:
-//				if(playing==false)
-//					return(true);
-//				sendToMoviePipe(str(boost::format("load \\\"%s\\\"") %videoList->filePath));
-//				playing=true;
-//				paused=false;
-//				break;
+
+
+
+
+
 //
-//			case PREVIOUS:
-//				if(playing==false)
-//					return(true);
-//				sendToPipe("pt_step -1");
-//				paused=false;
-//				break;
-
-			case PLAY:
-				//if(vplaying==true)
-				//	{
-						sendToMoviePipe("p");
-				//		vpaused=!vpaused;
-				//	}
-				//if(vplaying==true)
-				//	return(true);
-				break;
-
-//			case STOP:
-//				setLastPlayed();
-//				if(playing==false)
-//					return(true);
-//				for(int j=0;j<songs.size();j++)
-//					free(songs[j]);
-//				songs.clear();
-//				songList->CTK_clearList();
-//				sendToPipe("stop");
-//				albumArt->CTK_newFBImage(chooserWidth+6,artSY,artHite*2,artHite,"",false);
-//				nowPlaying->CTK_updateText("");
-//				playLists->lb->activeItem=-1;
-//				mainApp->CTK_setDefaultGadget(playLists->lb);
-//				mainApp->CTK_clearScreen();
-//				mainApp->CTK_updateScreen(mainApp,(void*)1);
-//				playing=false;
-//				paused=false;
-//				progressIndicator->CTK_setValue(0);
-//				progressIndicator->CTK_setMinValue(0);
-//				progressIndicator->CTK_setMaxValue(0);
-//				progressIndicator->CTK_drawGadget();
-//				updated=false;
-//				mainApp->CTK_updateScreen(mainApp,NULL);
-//				break;
-//
-			case PAUSE:
-				//if(vplaying==false)
-				//	return(true);
-				sendToMoviePipe("p");
-				//vpaused=!vpaused;
-				break;
-//
-//			case END:
-//				if(playing==false)
-//					return(true);
-//				sendToPipe(str(boost::format("p\\npausing_keep_force loadlist \\\"%s\\\"") %playLists->filePath));
-//				sendToPipe(str(boost::format("pausing_keep_force pt_step %i\\np") %(songs.size()-1)));
-//				playing=true;
-//				paused=false;
-//				break;
-//
-//			case NEXT:
-//				if(playing==false)
-//					return(true);
-//				sendToPipe("pt_step 1");
-//				paused=false;
-//				break;
-//
-
-			case STOP:
-			std::cerr << "got stop" << std::endl;
-				sendToMoviePipe("q");
-				sleep(1);
-				mainApp->CTK_clearScreen();
-				mainApp->CTK_updateScreen(mainApp,NULL);
-				fflush(NULL);
-				break;
-			case QUIT:
-				sendToMoviePipe("q");
-				//vpaused=false;
-				//vplaying=false;
-				doQuitVideo=true;
-				fflush(NULL);
-				break;
-
-
-//			case QUIT:
-//				setLastPlayed();
-//				for(int j=0;j<songs.size();j++)
-//					free(songs[j]);
-//				songs.clear();
-//				songList->CTK_clearList();
-//				playLists->lb->activeItem=-1;
-//				sendToPipe("stop");
-//				albumArt->CTK_newFBImage(chooserWidth+6,artSY,artHite*2,artHite,"",false);
-//				nowPlaying->CTK_updateText("");
-//				playing=false;
-//				paused=false;
-//				doQuitMusic=true;
-//				progressIndicator->CTK_setValue(0);
-//				progressIndicator->CTK_setMinValue(0);
-//				progressIndicator->CTK_setMaxValue(0);
-//				progressIndicator->CTK_drawGadget();
-//				fflush(NULL);
-//				break;
-		}
-
 //	switch(ud)
 //		{
+////			case START:
+////				if(playing==false)
+////					return(true);
+////				sendToMoviePipe(str(boost::format("load \\\"%s\\\"") %videoList->filePath));
+////				playing=true;
+////				paused=false;
+////				break;
+////
+////			case PREVIOUS:
+////				if(playing==false)
+////					return(true);
+////				sendToAudioPipe("pt_step -1");
+////				paused=false;
+////				break;
+//
+//			case PLAY:
+//				//if(vplaying==true)
+//				//	{
+//						sendToMoviePipe("p");
+//				//		vpaused=!vpaused;
+//				//	}
+//				//if(vplaying==true)
+//				//	return(true);
+//				break;
+//
+////			case STOP:
+////				setLastPlayed();
+////				if(playing==false)
+////					return(true);
+////				for(int j=0;j<songs.size();j++)
+////					free(songs[j]);
+////				songs.clear();
+////				songList->CTK_clearList();
+////				sendToAudioPipe("stop");
+////				albumArt->CTK_newFBImage(chooserWidth+6,artSY,artHite*2,artHite,"",false);
+////				nowPlaying->CTK_updateText("");
+////				playLists->lb->activeItem=-1;
+////				mainApp->CTK_setDefaultGadget(playLists->lb);
+////				mainApp->CTK_clearScreen();
+////				mainApp->CTK_updateScreen(mainApp,(void*)1);
+////				playing=false;
+////				paused=false;
+////				progressIndicator->CTK_setValue(0);
+////				progressIndicator->CTK_setMinValue(0);
+////				progressIndicator->CTK_setMaxValue(0);
+////				progressIndicator->CTK_drawGadget();
+////				updated=false;
+////				mainApp->CTK_updateScreen(mainApp,NULL);
+////				break;
+////
+//			case PAUSE:
+//				//if(vplaying==false)
+//				//	return(true);
+//				sendToMoviePipe("p");
+//				//vpaused=!vpaused;
+//				break;
+////
+////			case END:
+////				if(playing==false)
+////					return(true);
+////				sendToAudioPipe(str(boost::format("p\\npausing_keep_force loadlist \\\"%s\\\"") %playLists->filePath));
+////				sendToAudioPipe(str(boost::format("pausing_keep_force pt_step %i\\np") %(songs.size()-1)));
+////				playing=true;
+////				paused=false;
+////				break;
+////
+////			case NEXT:
+////				if(playing==false)
+////					return(true);
+////				sendToAudioPipe("pt_step 1");
+////				paused=false;
+////				break;
+////
+//
+//			case STOP:
+//			std::cerr << "got stop" << std::endl;
+//				sendToMoviePipe("q");
+//				sleep(1);
+//				mainApp->CTK_clearScreen();
+//				mainApp->CTK_updateScreen(mainApp,NULL);
+//				fflush(NULL);
+//				break;
 //			case QUIT:
-//			case HOMEIMAGE:
+//				sendToMoviePipe("q");
+//				//vpaused=false;
+//				//vplaying=false;
 //				doQuitVideo=true;
 //				fflush(NULL);
 //				break;
+//
+//
+////			case QUIT:
+////				setLastPlayed();
+////				for(int j=0;j<songs.size();j++)
+////					free(songs[j]);
+////				songs.clear();
+////				songList->CTK_clearList();
+////				playLists->lb->activeItem=-1;
+////				sendToAudioPipe("stop");
+////				albumArt->CTK_newFBImage(chooserWidth+6,artSY,artHite*2,artHite,"",false);
+////				nowPlaying->CTK_updateText("");
+////				playing=false;
+////				paused=false;
+////				doQuitMusic=true;
+////				progressIndicator->CTK_setValue(0);
+////				progressIndicator->CTK_setMinValue(0);
+////				progressIndicator->CTK_setMaxValue(0);
+////				progressIndicator->CTK_drawGadget();
+////				fflush(NULL);
+////				break;
 //		}
+//
+	switch(ud)
+		{
+////			case QUIT:
+			case HOMEIMAGE:
+				doQuitVideo=true;
+				fflush(NULL);
+				break;
+		}
 	return(true);
 }
 
-bool pagekeyVideoCB(CTK_mainAppClass *app,void *userdata)
-{
-	if(app->readKey->inputBuffer.length()!=0)
-		{
-			switch(toupper(app->readKey->inputBuffer.at(0)))
+//bool pagekeyVideoCB(CTK_mainAppClass *app,void *userdata)
+//{
+//	if(app->readKey->inputBuffer.length()!=0)
+//		{
+//			switch(toupper(app->readKey->inputBuffer.at(0)))
+//				{
+//					case 'F':
+//						sendToMoviePipe("seek +30");
+//						return(true);
+//						break;
+//					case 'R':
+//						sendToMoviePipe("seek -30");
+//						return(true);
+//						break;
+//					case ' ':
+//						moviesControlsCB(NULL,(void*)PAUSE);
+//						break;
+//					case 'Q':
+//						//controlsCB(NULL,(void*)QUIT);
+//						doQuitVideo=true;
+//						moviesControlsCB(NULL,(void*)QUIT);
+//						//fprintf(stderr,"---->>>>\n");
+//						break;
+////					case 'N':
+////					case '.':
+////						controlsCB(NULL,(void*)NEXT);
+////						break;
+////					case 'P':
+////					case ',':
+////						controlsCB(NULL,(void*)PREVIOUS);
+////						break;
+//					case 'S':
+//					case 'X':
+//						moviesControlsCB(NULL,(void*)STOP);
+//						break;
+//					default:
+//						return(false);
+//				}
+//		}
+//	else
+//		return(false);
+//	return(true);
+//}
+//const char	*videoPlayerButtons[][2]={{"Start",DATADIR "/pixmaps/MusicPlayer/pause.png"},
+//{"Stop",DATADIR "/pixmaps/MusicPlayer/stop.png"},
+//{"Quit",DATADIR "/pixmaps/MusicPlayer/quit.png"}
+//};
+
+/*
+			if(mp->readKey->inputBuffer.compare("q")==0)
 				{
-					case 'F':
-						sendToMoviePipe("seek +30");
-						return(true);
-						break;
-					case 'R':
-						sendToMoviePipe("seek -30");
-						return(true);
-						break;
-					case ' ':
-						moviesControlsCB(NULL,(void*)PAUSE);
-						break;
-					case 'Q':
-						//controlsCB(NULL,(void*)QUIT);
-						doQuitVideo=true;
-						moviesControlsCB(NULL,(void*)QUIT);
-						//fprintf(stderr,"---->>>>\n");
-						break;
-//					case 'N':
-//					case '.':
-//						controlsCB(NULL,(void*)NEXT);
-//						break;
-//					case 'P':
-//					case ',':
-//						controlsCB(NULL,(void*)PREVIOUS);
-//						break;
-					case 'S':
-					case 'X':
-						moviesControlsCB(NULL,(void*)STOP);
-						break;
-					default:
-						return(false);
+					sendToVideoPipe("quit");
+					vplaying=false;
 				}
+			if(mp->readKey->inputBuffer.compare("s")==0)
+				{
+					sendToVideoPipe("stop");
+					vplaying=false;
+				}
+			if(mp->readKey->inputBuffer.compare(">")==0)
+				{
+					sendToVideoPipe("seek +60.0" + std::string(keeppause));
+				}
+			if(mp->readKey->inputBuffer.compare("<")==0)
+				{
+					sendToVideoPipe("seek -60.0" + std::string(keeppause));
+				}
+
+*/
+bool movieControlsCB(void *inst,void *userdata)
+{
+	long	ud=(long)userdata;
+
+//if(isPaused==true)
+//	ignoreNL=true;//TODO//MMMmmmm
+
+fprintf(stderr,"ud=%i\n",ud);
+			//const char	*keeppause="";
+			//if(isPaused==true)
+			//	ignoreNL=true;
+			//	keeppause="\npause";
+					ignoreNL=true;
+		
+//isPaused=false;
+//			const char	*keeppause="";
+//			if(isPaused==true)
+//				keeppause="\npause";
+
+	switch(ud)
+		{
+			case VIDEOSTART:
+						{
+						fprintf(stderr,"pause=%i inorenl=%i\n",isPaused,ignoreNL);
+//				sendToVideoPipe("seek +60.0" );isPaused
+				if(isPaused==true)
+					{
+						ignoreNL=true;
+						sendToVideoPipe("pause");
+					}
+				else
+					{
+						ignoreNL=false;
+						isPaused=!isPaused;
+						sendToVideoPipe("pause\npause");
+					}
+				}
+
+//				ignoreNL=false;//TODO//MMMmmmm
+//				isPaused=false;
+//				mainApp->readKey->inputBuffer="";
+//				//mainApp->readKey->specialKeyName=CTK_KEY_NONE;
+//				//sendToVideoPipe("pause");
+//				sendToVideoPipe("pause\npause");
+				break;
+			case VIDEOSTOP:
+				sendToVideoPipe("stop");
+				vplaying=false;
+				break;
+			case VIDEOQUIT:
+				sendToVideoPipe("quit");
+				vplaying=false;
+				break;
+			case VIDEOSKIPAHEAD:
+			{
+				sendToVideoPipe("seek +60.0" );
+				if(isPaused==false)
+					sendToVideoPipe("pause");
+				else
+					ignoreNL=true;
+				}
+				break;
+			case VIDEOSKIPBACK:
+				//ignoreNL=true;//TODO//MMMmmmm
+				//isPaused=false;
+				//sendToVideoPipe("seek -60.0" + std::string(keeppause));
+				break;
 		}
-	else
-		return(false);
 	return(true);
 }
 
 bool playVideoCB(void *inst,void *userdata)
 {
-videoList->CTK_setVisible(false);
-mainApp->CTK_clearScreen();
-doQuitVideo=false;
-fprintf(stderr,"here >>%s<<\n",videoList->filePath.c_str());
-char *command;
-
-//	if(useFBImages==false)
-//		{
-//			//mplayer -quiet -slave -input file=/tmp/vmp "/media/BigBackup/Homenet/Homenet/Movies/chinamovies/Beijing Caves.mp4"
-//			system(str(boost::format("mplayer -quiet -slave -input file='%s' -idle >'%s' 2>/dev/null &") %videoFifoName %outName).c_str());
-//
-//		}
-//	else
-//		{
-//		}
-//ffprobe -v error -select_streams v:0 -show_entries stream=width,height,display_aspect_ratio -of default=nw=1:nk=1 "/media/BigBackup/Homenet/Homenet/Movies/Family/Airfield.mp4" 
-//352
-//288
-//4:3
+//TODO// set screen size in framebuffer
+	std::string command;
 	if(useFBImages==false)
-		system(str(boost::format("mplayer -quiet -slave -input file='%s' -idle -input nodefault-bindings >'%s' 2>/dev/null &") %videoFifoName %outName).c_str());
+		command=str(boost::format("mplayer -quiet -slave -input file='%s' '%s' >'%s' 2>/dev/null &") %videoFifoName %videoList->filePath %outName);
 	else
-		system(str(boost::format("mplayer -vo fbdev2 -quiet -slave -xy 1920 -zoom -input file='%s' -idle -input nodefault-bindings >'%s' 2>/dev/null &") %videoFifoName %outName).c_str());
-//sleep(2);
-	sendToMoviePipe(str(boost::format("loadfile \\\"%s\\\" 0 \n") %videoList->filePath));
-//asprintf(&command,"mplayer '%s'",videoList->filePath.c_str());
-//system(command);
+		command=str(boost::format("mplayer -vo fbdev2 -xy 1920 -zoom -fs -aspect 16:9 -quiet -slave -input file='%s' '%s' >'%s' 2>/dev/null &") %videoFifoName %videoList->filePath %outName);
 
-//	do
-//		{
-//			mainApp->CTK_mainEventLoop(-250,false);
-//			//getMeta();
-//		}
-//	while (doQuitVideo==false);
-fprintf(stderr,">>>>fin\n");
-//doQuitVideo=true;
+	system(command.c_str());
+
 mainApp->CTK_clearScreen();
 mainApp->CTK_updateScreen(mainApp,NULL);
 fflush(NULL);
 vplaying=true;
+//videoList->CTK_setEnabled(false);
+CTK_mainAppClass	ma;
+ma.eventLoopCBIn=mainloopCB;
+	CTK_cursesGadgetClass	*gadget;
+	int						yspread=2;
+	int						yoffset=0;
+	long					btnnumx=1;
+	int						btnnumy=1;
+	int						btncnt=2;
+
+	movieControlsSY=ma.maxRows-4;
+
+	btnnumx=0;
+	for(int j=0;j<VIDEONOMORE;j++)
+//int j=0;
+		{
+//			if(useFBImages==true)
+//				gadget=ma.CTK_addNewFBImage(ma.utils->CTK_getGadgetPos(1,ma.maxCols,VIDEONOMORE,4,btnnumx),movieControlsSY,4,4,moviePlayerButtons[j][int(useFBImages)]);
+//			else
+				gadget=ma.CTK_addNewButton(ma.utils->CTK_getGadgetPos(1,ma.maxCols,VIDEONOMORE,10,btnnumx+1),movieControlsSY,10,1,moviePlayerButtons[j][int(useFBImages)]);
+			gadget->CTK_setSelectCB(movieControlsCB,(void*)btnnumx++);
+
+
+		}
+
+
+
+
+ma.CTK_clearScreen();
+mainApp->CTK_clearScreen();
+ma.CTK_updateScreen(&ma,NULL);
+
+fflush(NULL);
+	do
+		{
+//fprintf(stderr,">>>>>>>>>>>>>>>>\n");
+			ma.CTK_mainEventLoop(-250,false);
+		}
+	while (vplaying==true);
+
+
+//v//ideoList->CTK_setEnabled(true);
+mainApp->CTK_clearScreen();
+mainApp->CTK_updateScreen(mainApp,NULL);
+
 return(true);
+//
+///*
+//	fp=fopen(filepath,"r");
+//	if(fp!=NULL)
+//		{
+//			while(fgets(buffer,PATH_MAX,fp))
+//				{
+//					datatype[0]=0;
+//					data[0]=0;
+//					varname[0]=0;
+//					if(buffer[0]=='\n')
+//						continue;
+//					sscanf(buffer,"%[^ ] %[^ ] %[^\n]",varname,datatype,data);
+//
+//*/
+//
+//
+//videoList->CTK_setVisible(false);
+//mainApp->CTK_clearScreen();
+//doQuitVideo=false;
+//fprintf(stderr,"here >>%s<<\n",videoList->filePath.c_str());
+//char *command;
+//
+////	if(useFBImages==false)
+////		{
+////			//mplayer -quiet -slave -input file=/tmp/vmp "/media/BigBackup/Homenet/Homenet/Movies/chinamovies/Beijing Caves.mp4"
+////			system(str(boost::format("mplayer -quiet -slave -input file='%s' -idle >'%s' 2>/dev/null &") %videoFifoName %outName).c_str());
+////
+////		}
+////	else
+////		{
+////		}
+////ffprobe -v error -select_streams v:0 -show_entries stream=width,height,display_aspect_ratio -of default=nw=1:nk=1 "/media/BigBackup/Homenet/Homenet/Movies/Family/Airfield.mp4" 
+////352
+////288
+////4:3
+//	if(useFBImages==false)
+//		system(str(boost::format("mplayer -quiet -slave -input file='%s' -idle -input nodefault-bindings >'%s' 2>/dev/null &") %videoFifoName %outName).c_str());
+//	else
+//		system(str(boost::format("mplayer -vo fbdev2 -quiet -slave -xy 1920 -zoom -input file='%s' -idle -input nodefault-bindings >'%s' 2>/dev/null &") %videoFifoName %outName).c_str());
+////sleep(2);
+//	sendToMoviePipe(str(boost::format("loadfile \\\"%s\\\" 0 \n") %videoList->filePath));
+//std::cerr << str(boost::format("mplayer -vo fbdev2 -quiet -slave -xy 1920 -zoom -input file='%s' -idle -input nodefault-bindings >'%s' 2>/dev/null &") %videoFifoName %outName)  << std::endl;
+////asprintf(&command,"mplayer '%s'",videoList->filePath.c_str());
+////system(command);
+//
+////	do
+////		{
+////			mainApp->CTK_mainEventLoop(-250,false);
+////			//getMeta();
+////		}
+////	while (doQuitVideo==false);
+//fprintf(stderr,">>>>fin\n");
+////doQuitVideo=true;
+//mainApp->CTK_clearScreen();
+//mainApp->CTK_updateScreen(mainApp,NULL);
+//fflush(NULL);
+//vplaying=true;
+//return(true);
 }
+
+void makeKeyConf(void)
+{
+	FILE		*fp;
+	varsStruct	retvs;
+
+	fp=fopen(TEMPFILES "/mplayerkeyconf","w");
+
+	if(fp!=NULL)
+		{
+//
+////control
+//			retvs=mainApp->utils->CTK_findVar(prefsData,"keycontrol");
+//		//	if(retvs.charVar.c_str()[0]=='\n')
+//				fprintf(stderr,">>%p<<\n",retvs.charVar.c_str()[0]);
+
+//pause
+			retvs=mainApp->utils->CTK_findVar(prefsData,"keypause");
+			if(retvs.charVar.c_str()[0]==' ')
+				fprintf(fp,"SPACE pause\n");
+			else
+				fprintf(fp,"%c pause\n",retvs.charVar.c_str()[0]);
+//stop
+			retvs=mainApp->utils->CTK_findVar(prefsData,"keystop");
+			fprintf(fp,"%c stop\n",retvs.charVar.c_str()[0]);
+//quit
+			retvs=mainApp->utils->CTK_findVar(prefsData,"keyquit");
+			fprintf(fp,"%c quit\n",retvs.charVar.c_str()[0]);
+//ff
+			retvs=mainApp->utils->CTK_findVar(prefsData,"keyfoward");
+			fprintf(fp,"%c seek +30\n",retvs.charVar.c_str()[0]);
+//rev
+			retvs=mainApp->utils->CTK_findVar(prefsData,"keyreverse");
+			fprintf(fp,"%c seek -30\n",retvs.charVar.c_str()[0]);
+//next
+			retvs=mainApp->utils->CTK_findVar(prefsData,"keynext");
+			fprintf(fp,"%c pt_step 1\n",retvs.charVar.c_str()[0]);
+//prev
+			retvs=mainApp->utils->CTK_findVar(prefsData,"keyprev");
+			fprintf(fp,"%c pt_step -1\n",retvs.charVar.c_str()[0]);
+
+			fclose(fp);
+		}
+}
+
 
 void makeMoviesPage(void)
 {
@@ -298,7 +577,10 @@ void makeMoviesPage(void)
 	//dialogWidth=mainApp->maxCols-4;
 	videoChooserWidth=((mainApp->maxCols/8)*5)-2;
 	videoChooserHite=mainApp->maxRows-16;
-
+videoChooserHite=gh;
+	videoChooserHite=mainApp->maxRows-16;
+	//int						gh=gw/(fbInfo->charHeight/fbInfo->charWidth);
+	
 	videoList=new CTK_cursesChooserClass(mainApp,3,2,videoChooserWidth,videoChooserHite);
 	videoList->CTK_setShowTypes(ANYTYPE);
 	videoList->CTK_setShowHidden(false);
@@ -315,22 +597,31 @@ void makeMoviesPage(void)
 //line2
 //	btnnumx=1;
 //	btnnumy++;
-//	if(useFBImages==true)
-//		{
-//			gw=gw/2;
-//			yspread=4;
-//			yoffset=2;
-//		}
+	if(useFBImages==true)
+		{
+			gw=gw/2;
+			yspread=4;
+			yoffset=2;
+		}
 	movieControlsSY=mainApp->maxRows-4;
 	btnnumx=1;
-	for(int j=0;j<CONTROLCNT;j++)
-		{
-			if(useFBImages==true)
-				gadget=mainApp->CTK_addNewFBImage(mainApp->utils->CTK_getGadgetPos(1,mainApp->maxCols,CONTROLCNT,4,btnnumx),movieControlsSY,4,4,moviePlayerButtons[j][int(useFBImages)]);
-			else
-				gadget=mainApp->CTK_addNewButton(mainApp->utils->CTK_getGadgetPos(1,mainApp->maxCols,CONTROLCNT,10,btnnumx),movieControlsSY,10,1,moviePlayerButtons[j][int(useFBImages)]);
-				gadget->CTK_setSelectCB(moviesControlsCB,(void*)btnnumx++);
-		}
+btnnumy=1;
+//newButtonSpread(int bx,int bw,int by,int bh,int gadw,int gadh,int gadcntx,int gadcnty,int gadnumx,int gadnumy,const char *path,bool useimage)
+	gadget=newButtonSpread(1,mainApp->maxCols,1,mainApp->maxRows,gw,gh,3,6,2,6,buttonNames[HOMEIMAGE][int(useFBImages)],useFBImages);
+	gadget->CTK_setSelectCB(moviesControlsCB,(void*)HOMEIMAGE);
+
+
+//gadget=mainApp->CTK_addNewFBImage(mainApp->utils->CTK_getGadgetPos(1,mainApp->maxCols,(buttonSymbolicNames)QUITBTN,10,btnnumx),movieControlsSY,10,1,moviePlayerButtons[QUITBTN][int(useFBImages)]);
+
+//	for(int j=0;j<CONTROLCNT;j++)
+//		{
+//			if(useFBImages==true)
+//				gadget=mainApp->CTK_addNewFBImage(mainApp->utils->CTK_getGadgetPos(1,mainApp->maxCols,CONTROLCNT,4,btnnumx),movieControlsSY,4,4,moviePlayerButtons[j][int(useFBImages)]);
+//			else
+//				gadget=mainApp->CTK_addNewButton(mainApp->utils->CTK_getGadgetPos(1,mainApp->maxCols,CONTROLCNT,10,btnnumx),movieControlsSY,10,1,moviePlayerButtons[j][int(useFBImages)]);
+////				gadget->CTK_setSelectCB(moviesControlsCB,(void*)btnnumx++);
+//			btnnumx++;
+//		}
 
 
 //home
@@ -338,8 +629,10 @@ void makeMoviesPage(void)
 //	gadget->CTK_setSelectCB(moviesControlsCB,(void*)HOMEIMAGE);
 
 //keyboard control
-	mainApp->pages[mainApp->pageNumber].pageKey=pagekeyVideoCB;
+////	mainApp->pages[mainApp->pageNumber].pageKey=pagekeyVideoCB;
+makeKeyConf();
 }
+
 
 void runVideo(void)
 {
@@ -361,8 +654,19 @@ void runVideo(void)
 	//videoList->CTK_setVisible(false);
 	//mainApp->CTK_clearScreen();
 //	return;
+//mainApp->eventLoopCBIn=mainloopCB;
+//mainApp->eventLoopCBOut=mainloopCB;
+//mainApp->eventLoopCBIn=mainloopCB;
+
 	do
 		{
+//
+////control
+//			retvs=mainApp->utils->CTK_findVar(prefsData,"keycontrol");
+//		//	if(retvs.charVar.c_str()[0]=='\n')
+//				fprintf(stderr,">>%p<<\n",retvs.charVar.c_str()[0]);
+
+//fprintf(stderr,">>>>>>>>>>>>>>>>\n");
 			mainApp->CTK_mainEventLoop(-250,false);
 			//getMeta();
 		}

@@ -79,7 +79,7 @@ std::vector<std::string> runApplication(std::string com)
 	return(splits);
 }
 
-void sendToPipe(const std::string command)
+void sendToAudioPipe(const std::string command)
 {
 	std::string	buffer="echo -e \"";
 	buffer+=command + "\" >\"" + musicFifoName + "\" &";
@@ -155,7 +155,7 @@ bool playListsCB(void *inst,void *userdata)
 			commandString+=ch->filePath + "'";
 		}
 
-	sendToPipe(commandString);
+	sendToAudioPipe(commandString);
 	playing=true;
 	songList->CTK_drawGadget();
 	fflush(NULL);
@@ -174,7 +174,7 @@ void getMeta(void)
 	if((playing==false) || (paused==true) || (doQuitMusic==true))
 		return;
 
-	sendToPipe("get_property path\\nget_file_name\\nget_meta_album\\nget_meta_title\\nget_meta_artist\\nget_time_pos\\nget_time_length");
+	sendToAudioPipe("get_property path\\nget_file_name\\nget_meta_album\\nget_meta_title\\nget_meta_artist\\nget_time_pos\\nget_time_length");
 
 	std::vector<std::string> lines=runApplication(str(boost::format("tail -n7 '%s'") %outName));
 	if(lines.size()==8)
@@ -251,12 +251,12 @@ bool selectSongCB(void *inst,void *userdata)
 	if(sl->listItems.size()==0)
 		return(true);
 
-	sendToPipe(str(boost::format("p\\npausing_keep_force loadlist \\\"%s\\\"") %playLists->filePath));
+	sendToAudioPipe(str(boost::format("p\\npausing_keep_force loadlist \\\"%s\\\"") %playLists->filePath));
 
 	if((long)sl->listItems[sl->listItemNumber]->userData!=0)
-		sendToPipe(str(boost::format("pausing_keep_force pt_step %i") %(long)sl->listItems[sl->listItemNumber]->userData));
+		sendToAudioPipe(str(boost::format("pausing_keep_force pt_step %i") %(long)sl->listItems[sl->listItemNumber]->userData));
 	else
-		sendToPipe("p");
+		sendToAudioPipe("p");
 
 	playing=true;
 	paused=false;
@@ -336,7 +336,7 @@ bool controlsCB(void *inst,void *userdata)
 			case START:
 				if(playing==false)
 					return(true);
-				sendToPipe(str(boost::format("loadlist \\\"%s\\\"") %playLists->filePath));
+				sendToAudioPipe(str(boost::format("loadlist \\\"%s\\\"") %playLists->filePath));
 				playing=true;
 				paused=false;
 				break;
@@ -344,14 +344,14 @@ bool controlsCB(void *inst,void *userdata)
 			case PREVIOUS:
 				if(playing==false)
 					return(true);
-				sendToPipe("pt_step -1");
+				sendToAudioPipe("pt_step -1");
 				paused=false;
 				break;
 
 			case PLAY:
 				if(playing==true)
 					{
-						sendToPipe("p");
+						sendToAudioPipe("p");
 						paused=!paused;
 					}
 				if(playing==true)
@@ -366,7 +366,7 @@ bool controlsCB(void *inst,void *userdata)
 					free(songs[j]);
 				songs.clear();
 				songList->CTK_clearList();
-				sendToPipe("stop");
+				sendToAudioPipe("stop");
 				albumArt->CTK_newFBImage(chooserWidth+6,artSY,artHite*2,artHite,"",false);
 				nowPlaying->CTK_updateText("");
 				playLists->lb->activeItem=-1;
@@ -386,15 +386,15 @@ bool controlsCB(void *inst,void *userdata)
 			case PAUSE:
 				if(playing==false)
 					return(true);
-				sendToPipe("p");
+				sendToAudioPipe("p");
 				paused=!paused;
 				break;
 
 			case END:
 				if(playing==false)
 					return(true);
-				sendToPipe(str(boost::format("p\\npausing_keep_force loadlist \\\"%s\\\"") %playLists->filePath));
-				sendToPipe(str(boost::format("pausing_keep_force pt_step %i\\np") %(songs.size()-1)));
+				sendToAudioPipe(str(boost::format("p\\npausing_keep_force loadlist \\\"%s\\\"") %playLists->filePath));
+				sendToAudioPipe(str(boost::format("pausing_keep_force pt_step %i\\np") %(songs.size()-1)));
 				playing=true;
 				paused=false;
 				break;
@@ -402,7 +402,7 @@ bool controlsCB(void *inst,void *userdata)
 			case NEXT:
 				if(playing==false)
 					return(true);
-				sendToPipe("pt_step 1");
+				sendToAudioPipe("pt_step 1");
 				paused=false;
 				break;
 
@@ -413,7 +413,7 @@ bool controlsCB(void *inst,void *userdata)
 				songs.clear();
 				songList->CTK_clearList();
 				playLists->lb->activeItem=-1;
-				sendToPipe("stop");
+				sendToAudioPipe("stop");
 				albumArt->CTK_newFBImage(chooserWidth+6,artSY,artHite*2,artHite,"",false);
 				nowPlaying->CTK_updateText("");
 				playing=false;
@@ -429,18 +429,104 @@ bool controlsCB(void *inst,void *userdata)
 	return(true);
 }
 
+/*
+-input <commands>
+This option can be used to configure certain parts of the input system. Paths are relative to ~/.mplayer/.
+NOTE: Autorepeat is currently only supported by joysticks.
+Available commands are:
+
+conf=<filename>
+Specify input configuration file other than the default ~/.mplayer/input.conf. ~/.mplayer/<filename> is assumed if no full path is given.
+
+ar-dev=<device>
+Device to be used for Apple IR Remote (default is autodetected, Linux only).
+
+ar-delay
+Delay in milliseconds before we start to autorepeat a key (0 to disable).
+
+ar-rate
+Number of key presses to generate per second on autorepeat.
+
+(no)default-bindings
+Use the key bindings that MPlayer ships with by default.
+
+keylist
+Prints all keys that can be bound to commands.
+
+cmdlist
+
+*/
 bool pagekeyCB(CTK_mainAppClass *app,void *userdata)
 {
+//return(false);
+varsStruct retvs;
+//retval=false;
 	if(app->readKey->inputBuffer.length()!=0)
 		{
+#if 1
+//pause
+			retvs=mainApp->utils->CTK_findVar(prefsData,"keypause");
+			//if(strcmp(toupper(app->readKey->inputBuffer.at(0)),retvs
+			//std::cerr << toupper(app->readKey->inputBuffer.at(0)) << "--" << ">>" << retvs.charVar.c_str() << "<<" << std::endl;
+			if(app->readKey->inputBuffer.at(0)==retvs.charVar.c_str()[0])
+				{
+					controlsCB(NULL,(void*)PAUSE);
+					return(true);
+				}
+//stop
+			retvs=mainApp->utils->CTK_findVar(prefsData,"keystop");
+			if(app->readKey->inputBuffer.at(0)==retvs.charVar.c_str()[0])
+				{
+					controlsCB(NULL,(void*)STOP);
+					return(true);
+				}
+//quit
+			retvs=mainApp->utils->CTK_findVar(prefsData,"keyquit");
+			if(app->readKey->inputBuffer.at(0)==retvs.charVar.c_str()[0])
+				{
+					controlsCB(NULL,(void*)QUIT);
+					return(true);
+				}
+//ff
+			retvs=mainApp->utils->CTK_findVar(prefsData,"keyfoward");
+			if(app->readKey->inputBuffer.at(0)==retvs.charVar.c_str()[0])
+				{
+					sendToAudioPipe("seek +30");
+					return(true);
+				}
+//rev
+			retvs=mainApp->utils->CTK_findVar(prefsData,"keyreverse");
+			if(app->readKey->inputBuffer.at(0)==retvs.charVar.c_str()[0])
+				{
+					sendToAudioPipe("seek -30");
+					return(true);
+				}
+//next
+			retvs=mainApp->utils->CTK_findVar(prefsData,"keynext");
+			if(app->readKey->inputBuffer.at(0)==retvs.charVar.c_str()[0])
+				{
+					controlsCB(NULL,(void*)NEXT);
+					return(true);
+				}
+//prev
+			retvs=mainApp->utils->CTK_findVar(prefsData,"keyprev");
+			if(app->readKey->inputBuffer.at(0)==retvs.charVar.c_str()[0])
+				{
+					controlsCB(NULL,(void*)PREVIOUS);
+					return(true);
+				}
+
+			return(false);
+					
+#else
 			switch(toupper(app->readKey->inputBuffer.at(0)))
 				{
 					case 'F':
-						sendToPipe("seek +30");
+						sendToAudioPipe("seek +30");
 						return(true);
 						break;
 					case 'R':
-						sendToPipe("seek -30");
+						sendToAudioPipe("seek -30");
 						return(true);
 						break;
 					case ' ':
@@ -464,6 +550,7 @@ bool pagekeyCB(CTK_mainAppClass *app,void *userdata)
 					default:
 						return(false);
 				}
+#endif
 		}
 	else
 		return(false);
@@ -559,7 +646,7 @@ void makeMusicPage(void)
 				gadget=mainApp->CTK_addNewFBImage(mainApp->utils->CTK_getGadgetPos(1,mainApp->maxCols,CONTROLCNT,4,btnnumx),controlsSY,4,4,musicPlayerButtons[j][int(useFBImages)]);
 			else
 				gadget=mainApp->CTK_addNewButton(mainApp->utils->CTK_getGadgetPos(1,mainApp->maxCols,CONTROLCNT,10,btnnumx),controlsSY,10,1,musicPlayerButtons[j][int(useFBImages)]);
-				gadget->CTK_setSelectCB(controlsCB,(void*)btnnumx++);
+			gadget->CTK_setSelectCB(controlsCB,(void*)btnnumx++);
 		}
 
 	albumArt=mainApp->CTK_addNewFBImage(chooserWidth+7,artSY,artHite,artHite,NULL,false);

@@ -23,6 +23,8 @@
 
 #include "globals.h"
 
+enum {VIDEOSTART=0,VIDEOSTOP,VIDEOQUIT,VIDEOSKIPAHEAD,VIDEOSKIPBACK,VIDEONOMORE};
+
 extern CTK_cursesChooserClass	*videoList;
 extern const char				*videoListFolder;
 

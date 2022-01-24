@@ -25,6 +25,7 @@
 struct option long_options[] =
 	{
 		{"noimages",0,0,'n'},
+		{"defaultprefs",0,0,'d'},
 		{"version",0,0,'v'},
 		{"help",0,0,'?'},
 		{0, 0, 0, 0}
@@ -34,37 +35,59 @@ void printHelp()
 {
 	printf("Usage: fbmediaplayer [OPTION]\n"
 		"Frame Buffer Media Player\n"
-		" -n, --noimages	Don't use images\n"
-		" -v, --version	output version information and exit\n"
-		" -h, -?, --help	print this help\n\n"
+		" -n, --noimages\n\tDon't use images\n"
+		" -d, --defaultprefs\n\tWrite prefs file and echo to stderr\n"
+		" -v, --version\n\tOutput version information and exit\n"
+		" -h, -?, --help\n\tPrint this help\n\n"
 		"Report bugs to keithdhedger@gmail.com\n"
 		);
 }
 
 int main(int argc, char **argv)
 {
+	if(system("tty|grep pts &>/dev/null")==0)
+		useFBImages=false;
+
+	mainApp=new CTK_mainAppClass();
 	while (1)
 		{
 			int	c;
 			int	option_index=0;
-			c=getopt_long(argc,argv,"v?hn",long_options,&option_index);
+			c=getopt_long(argc,argv,"v?hnd",long_options,&option_index);
 			if(c==-1)
 				break;
 
 			switch (c)
 				{
+					case 'd':
+						prefsPath=getenv("HOME");
+						prefsPath+="/.FBMediaPlayer";
+						mkdir(prefsPath.c_str(),0700);
+						prefsPath+="/fbmediaplayerprefs.rc";
+						if(access(prefsPath.c_str(),F_OK)==0)
+							prefsData=mainApp->utils->CTK_loadVars(prefsPath.c_str(),false,prefsData);
+						mainApp->utils->CTK_saveVars(prefsPath.c_str(),prefsData);
+						mainApp->utils->CTK_saveVars("2",prefsData);
+						SETSHOWCURS;
+						delete mainApp;
+						return ALLOK;
+						break;
 					case 'n':
 						useFBImages=false;
 						break;
 
 					case 'v':
 						printf("fbmediaplayer %s\n",VERSION);
+						SETSHOWCURS;
+						delete mainApp;
 						return ALLOK;
 						break;
 
 					case '?':
 					case 'h':
 						printHelp();
+						SETSHOWCURS;
+						delete mainApp;
 						return ALLOK;
 						break;
 
@@ -76,13 +99,17 @@ int main(int argc, char **argv)
 		}
 
 	mkdir(TEMPFILES,0700);
-	musicFifoName=str(boost::format("%s/mplayerafifo%i") %TEMPFILES %getpid());
-	videoFifoName=str(boost::format("%s/mplayervfifo%i") %TEMPFILES %getpid());
-	outName=str(boost::format("%s/mplayerout%i") %TEMPFILES %getpid());
+//	musicFifoName=str(boost::format("%s/mplayerafifo%i") %TEMPFILES %getpid());
+//	videoFifoName=str(boost::format("%s/mplayervfifo%i") %TEMPFILES %getpid());
+//	outName=str(boost::format("%s/mplayerout%i") %TEMPFILES %getpid());
+	musicFifoName=str(boost::format("%s/mplayerafifo") %TEMPFILES);
+	videoFifoName=str(boost::format("%s/mplayervfifo") %TEMPFILES);
+	outName=str(boost::format("%s/mplayerout") %TEMPFILES);
+
 	mkfifo(musicFifoName.c_str(),0700);
 	mkfifo(videoFifoName.c_str(),0700);
 
-	mainApp=new CTK_mainAppClass();
+	//mainApp=new CTK_mainAppClass();
 	fbInfo=mainApp->CTK_getFBData();
 
 	SETHIDECURS;
@@ -102,12 +129,13 @@ int main(int argc, char **argv)
 	mainApp->CTK_updateScreen(mainApp,NULL);//TODO//
 	mainApp->CTK_mainEventLoop(0,false,false);
 
-	sendToPipe("q");
+	sendToAudioPipe("q");
 	system("rm -rf '" TEMPFILES "'");
 
 	SETSHOWCURS;
 	delete mainApp;
 
+//fprintf(stderr,"int=%i\n",isatty(fileno(stdin)));
 	return(0);
 }
 
