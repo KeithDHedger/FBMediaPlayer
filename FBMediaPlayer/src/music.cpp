@@ -228,7 +228,7 @@ void getMeta(void)
 							commandString=str(boost::format(":>'%s'") %outName);
 							system(commandString.c_str());
 
-							albumArt->CTK_newFBImage(chooserWidth+5,artSY,artHite*2,artHite,folder.c_str(),false);
+							albumArt->CTK_newFBImage(chooserWidth+6+((songsWidth/2)-(artHite)),artSY,artHite*2,artHite,folder.c_str(),false);
 							songList->CTK_setItem(songList->CTK_findByLabel(lines.at(1).substr(lines.at(1).find("='")+2,lines.at(1).length()-lines.at(1).find("='")-3)),true);
 							mainApp->CTK_updateScreen(mainApp,NULL);
 						}
