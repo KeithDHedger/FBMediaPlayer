@@ -20,8 +20,6 @@
  
 #include "movies.h"
 
-
-
 CTK_cursesChooserClass		*videoList;
 const char					*videoListFolder="./";
 int							videoMidWay;
@@ -32,13 +30,153 @@ int							movieControlsSY;
 bool						vplaying=false;
 bool						vpaused=false;
 
-
 const char	*moviePlayerButtons[][2]={{"Play",DATADIR "/pixmaps/MusicPlayer/pause.png"},
 {"Stop",DATADIR "/pixmaps/MusicPlayer/stop.png"},
 {"Quit",DATADIR "/pixmaps/MusicPlayer/quit.png"},
 {"Next",DATADIR "/pixmaps/MusicPlayer/next.png"},
 {"Prev",DATADIR "/pixmaps/MusicPlayer/prev.png"},
 };
+
+void sendToVideoPipe(const std::string command)
+{
+	std::string	buffer="echo -e \"";
+	buffer+=command + "\" >\"" + videoFifoName + "\" &";
+	system(buffer.c_str());
+}
+
+bool moviePauseControlsCB(void *inst,void *userdata)
+{
+	long	ud=(long)userdata;
+
+fprintf(stderr,"ud=%i\n",ud);
+
+	switch(ud)
+		{
+			case VIDEOSTART:
+				{
+					vpaused=false;
+					sendToVideoPipe("pause");
+				}
+				break;
+			case VIDEOSTOP:
+				sendToVideoPipe("stop");
+				vplaying=false;
+				vpaused=false;
+				//doQuitVideo=true;
+				//mainApp->CTK_setPage(2);
+				break;
+			case VIDEOQUIT:
+				break;
+			case VIDEOSKIPAHEAD:
+				break;
+			case VIDEOSKIPBACK:
+				break;
+		}
+	return(true);
+}
+
+void makeMoviePausePage(void)
+{
+	CTK_mainAppClass	ma;
+	CTK_cursesGadgetClass	*gadget;
+	CTK_cursesGadgetClass	*gadget0;
+
+	int						yspread=2;
+	int						yoffset=0;
+	long					btnnumx=1;
+	int						btnnumy=1;
+	int						btncnt=2;
+
+	movieControlsSY=ma.maxRows-4;
+
+	btnnumx=0;
+	for(int j=0;j<VIDEONOMORE;j++)
+		{
+			if(useFBImages==true)
+				gadget=ma.CTK_addNewFBImage(ma.utils->CTK_getGadgetPos(1,ma.maxCols,VIDEONOMORE,4,btnnumx),movieControlsSY,4,4,moviePlayerButtons[j][int(useFBImages)]);
+			else
+				gadget=ma.CTK_addNewButton(ma.utils->CTK_getGadgetPos(1,ma.maxCols,VIDEONOMORE,10,btnnumx+1),movieControlsSY,10,1,moviePlayerButtons[j][int(useFBImages)]);
+if(btnnumx==0)
+	gadget0=gadget;
+			gadget->CTK_setSelectCB(moviePauseControlsCB,(void*)btnnumx++);
+		}
+
+//	while(vplaying==true)
+		{
+			ma.CTK_setDefaultGadget(gadget0,false);
+			ma.CTK_clearScreen();
+			ma.CTK_updateScreen(&ma,NULL);
+			fflush(NULL);
+			vpaused=true;
+			do
+				ma.CTK_mainEventLoop(-250,false);
+			while (vpaused==true);
+			ma.CTK_clearScreen();
+		}
+}
+
+/*
+CTK_mainAppClass	ma;
+ma.eventLoopCBIn=mainloopCB;
+	CTK_cursesGadgetClass	*gadget;
+	int						yspread=2;
+	int						yoffset=0;
+	long					btnnumx=1;
+	int						btnnumy=1;
+	int						btncnt=2;
+
+	movieControlsSY=ma.maxRows-4;
+
+	btnnumx=0;
+	for(int j=0;j<VIDEONOMORE;j++)
+//int j=0;
+		{
+//			if(useFBImages==true)
+//				gadget=ma.CTK_addNewFBImage(ma.utils->CTK_getGadgetPos(1,ma.maxCols,VIDEONOMORE,4,btnnumx),movieControlsSY,4,4,moviePlayerButtons[j][int(useFBImages)]);
+//			else
+				gadget=ma.CTK_addNewButton(ma.utils->CTK_getGadgetPos(1,ma.maxCols,VIDEONOMORE,10,btnnumx+1),movieControlsSY,10,1,moviePlayerButtons[j][int(useFBImages)]);
+			gadget->CTK_setSelectCB(movieControlsCB,(void*)btnnumx++);
+
+
+		}
+
+
+
+
+ma.CTK_clearScreen();
+mainApp->CTK_clearScreen();
+ma.CTK_updateScreen(&ma,NULL);
+
+fflush(NULL);
+	do
+		{
+//fprintf(stderr,">>>>>>>>>>>>>>>>\n");
+			ma.CTK_mainEventLoop(-250,false);
+		}
+	while (vplaying==true);
+
+
+*/
+
+
+//
+//CTK_cursesChooserClass		*videoList;
+//const char					*videoListFolder="./";
+//int							videoMidWay;
+//int							videoChooserWidth;
+//int							videoChooserHite;
+//bool						doQuitVideo=false;
+//int							movieControlsSY;
+//bool						vplaying=false;
+//bool						vpaused=false;
+//
+//
+//const char	*moviePlayerButtons[][2]={{"Play",DATADIR "/pixmaps/MusicPlayer/pause.png"},
+//{"Stop",DATADIR "/pixmaps/MusicPlayer/stop.png"},
+//{"Quit",DATADIR "/pixmaps/MusicPlayer/quit.png"},
+//{"Next",DATADIR "/pixmaps/MusicPlayer/next.png"},
+//{"Prev",DATADIR "/pixmaps/MusicPlayer/prev.png"},
+//};
 
 //void sendToMoviePipe(const std::string command)
 //{
@@ -49,62 +187,22 @@ const char	*moviePlayerButtons[][2]={{"Play",DATADIR "/pixmaps/MusicPlayer/pause
 //}
 
 
-void sendToVideoPipe(const std::string command)
-{
-	std::string	buffer="echo -e \"";
-	buffer+=command + "\" >\"" + videoFifoName + "\" &";
-	system(buffer.c_str());
-}
-
 bool	isPaused=false;
 bool	ignoreNL=false;
 
 void mainloopCB(void *mainc,void *data)
 {
-	if(ignoreNL==true)
-		{
-			//ignoreNL=false;
-			return;
-		}
-	
 	CTK_mainAppClass *mp=(CTK_mainAppClass *)mainc;
 	if((mp->readKey->isHexString==true) && (mp->readKey->specialKeyName==CTK_KEY_RETURN))
 		{
 			sendToVideoPipe("pause");
-			isPaused=!isPaused;
-			if(isPaused==true)
-				ignoreNL=false;
+			makeMoviePausePage();
 		}
-//	else
-//		{
-//			const char	*keeppause="";
-//			if(isPaused==true)
-//				keeppause="\npause";
-//
-//			//fprintf(stderr,">>%s<<\n",mp->readKey->inputBuffer.c_str());
-////			if(mp->readKey->inputBuffer.compare("q")==0)
-////				{
-////					sendToVideoPipe("quit");
-////					vplaying=false;
-////				}
-////			if(mp->readKey->inputBuffer.compare("s")==0)
-////				{
-////					sendToVideoPipe("stop");
-////					vplaying=false;
-////				}
-////			if(mp->readKey->inputBuffer.compare(">")==0)
-////				{
-////					sendToVideoPipe("seek +60.0" + std::string(keeppause));
-////				}
-////			if(mp->readKey->inputBuffer.compare("<")==0)
-////				{
-////					sendToVideoPipe("seek -60.0" + std::string(keeppause));
-////				}
-//		}
 }
 
 bool moviesControlsCB(void *inst,void *userdata)
 {
+//return(true);
 	long	ud=(long)userdata;
 
 
@@ -383,121 +481,27 @@ bool playVideoCB(void *inst,void *userdata)
 //TODO// set screen size in framebuffer
 	std::string command;
 	if(useFBImages==false)
-		command=str(boost::format("mplayer -quiet -slave -input file='%s' '%s' >'%s' 2>/dev/null &") %videoFifoName %videoList->filePath %outName);
+		command=str(boost::format("mplayer -geometry 50:50 -quiet -slave -input file='%s' '%s' >'%s' 2>/dev/null &") %videoFifoName %videoList->filePath %outName);
 	else
 		command=str(boost::format("mplayer -vo fbdev2 -xy 1920 -zoom -fs -aspect 16:9 -quiet -slave -input file='%s' '%s' >'%s' 2>/dev/null &") %videoFifoName %videoList->filePath %outName);
 
 	system(command.c_str());
-
-mainApp->CTK_clearScreen();
-mainApp->CTK_updateScreen(mainApp,NULL);
-fflush(NULL);
-vplaying=true;
-//videoList->CTK_setEnabled(false);
-CTK_mainAppClass	ma;
-ma.eventLoopCBIn=mainloopCB;
-	CTK_cursesGadgetClass	*gadget;
-	int						yspread=2;
-	int						yoffset=0;
-	long					btnnumx=1;
-	int						btnnumy=1;
-	int						btncnt=2;
-
-	movieControlsSY=ma.maxRows-4;
-
-	btnnumx=0;
-	for(int j=0;j<VIDEONOMORE;j++)
-//int j=0;
-		{
-//			if(useFBImages==true)
-//				gadget=ma.CTK_addNewFBImage(ma.utils->CTK_getGadgetPos(1,ma.maxCols,VIDEONOMORE,4,btnnumx),movieControlsSY,4,4,moviePlayerButtons[j][int(useFBImages)]);
-//			else
-				gadget=ma.CTK_addNewButton(ma.utils->CTK_getGadgetPos(1,ma.maxCols,VIDEONOMORE,10,btnnumx+1),movieControlsSY,10,1,moviePlayerButtons[j][int(useFBImages)]);
-			gadget->CTK_setSelectCB(movieControlsCB,(void*)btnnumx++);
-
-
-		}
-
-
-
-
-ma.CTK_clearScreen();
-mainApp->CTK_clearScreen();
-ma.CTK_updateScreen(&ma,NULL);
-
-fflush(NULL);
+	vplaying=true;
+	CTK_mainAppClass	ma;
+	ma.eventLoopCBIn=mainloopCB;
+	ma.CTK_clearScreen();
+	mainApp->CTK_clearScreen();
+	ma.CTK_updateScreen(&ma,NULL);
+	fflush(NULL);
 	do
 		{
-//fprintf(stderr,">>>>>>>>>>>>>>>>\n");
 			ma.CTK_mainEventLoop(-250,false);
 		}
-	while (vplaying==true);
-
-
-//v//ideoList->CTK_setEnabled(true);
-mainApp->CTK_clearScreen();
-mainApp->CTK_updateScreen(mainApp,NULL);
-
-return(true);
-//
-///*
-//	fp=fopen(filepath,"r");
-//	if(fp!=NULL)
-//		{
-//			while(fgets(buffer,PATH_MAX,fp))
-//				{
-//					datatype[0]=0;
-//					data[0]=0;
-//					varname[0]=0;
-//					if(buffer[0]=='\n')
-//						continue;
-//					sscanf(buffer,"%[^ ] %[^ ] %[^\n]",varname,datatype,data);
-//
-//*/
-//
-//
-//videoList->CTK_setVisible(false);
-//mainApp->CTK_clearScreen();
-//doQuitVideo=false;
-//fprintf(stderr,"here >>%s<<\n",videoList->filePath.c_str());
-//char *command;
-//
-////	if(useFBImages==false)
-////		{
-////			//mplayer -quiet -slave -input file=/tmp/vmp "/media/BigBackup/Homenet/Homenet/Movies/chinamovies/Beijing Caves.mp4"
-////			system(str(boost::format("mplayer -quiet -slave -input file='%s' -idle >'%s' 2>/dev/null &") %videoFifoName %outName).c_str());
-////
-////		}
-////	else
-////		{
-////		}
-////ffprobe -v error -select_streams v:0 -show_entries stream=width,height,display_aspect_ratio -of default=nw=1:nk=1 "/media/BigBackup/Homenet/Homenet/Movies/Family/Airfield.mp4" 
-////352
-////288
-////4:3
-//	if(useFBImages==false)
-//		system(str(boost::format("mplayer -quiet -slave -input file='%s' -idle -input nodefault-bindings >'%s' 2>/dev/null &") %videoFifoName %outName).c_str());
-//	else
-//		system(str(boost::format("mplayer -vo fbdev2 -quiet -slave -xy 1920 -zoom -input file='%s' -idle -input nodefault-bindings >'%s' 2>/dev/null &") %videoFifoName %outName).c_str());
-////sleep(2);
-//	sendToMoviePipe(str(boost::format("loadfile \\\"%s\\\" 0 \n") %videoList->filePath));
-//std::cerr << str(boost::format("mplayer -vo fbdev2 -quiet -slave -xy 1920 -zoom -input file='%s' -idle -input nodefault-bindings >'%s' 2>/dev/null &") %videoFifoName %outName)  << std::endl;
-////asprintf(&command,"mplayer '%s'",videoList->filePath.c_str());
-////system(command);
-//
-////	do
-////		{
-////			mainApp->CTK_mainEventLoop(-250,false);
-////			//getMeta();
-////		}
-////	while (doQuitVideo==false);
-//fprintf(stderr,">>>>fin\n");
-////doQuitVideo=true;
-//mainApp->CTK_clearScreen();
-//mainApp->CTK_updateScreen(mainApp,NULL);
-//fflush(NULL);
-//vplaying=true;
-//return(true);
+	while(vplaying==true);
+	mainApp->CTK_clearScreen();
+	mainApp->CTK_updateScreen(mainApp,NULL);
+	//mainApp->CTK_setPage(3);
+	return(true);
 }
 
 void makeKeyConf(void)
@@ -557,7 +561,7 @@ void makeMoviesPage(void)
 	int						btncnt=2;	
 
 	mainApp->CTK_addPage();
-
+fprintf(stderr,"page=%i\n",mainApp->pageNumber);
 	if(useFBImages==false)
 		gw=10;
 
@@ -577,7 +581,7 @@ void makeMoviesPage(void)
 	//dialogWidth=mainApp->maxCols-4;
 	videoChooserWidth=((mainApp->maxCols/8)*5)-2;
 	videoChooserHite=mainApp->maxRows-16;
-videoChooserHite=gh;
+	videoChooserHite=gh;
 	videoChooserHite=mainApp->maxRows-16;
 	//int						gh=gw/(fbInfo->charHeight/fbInfo->charWidth);
 	
@@ -671,7 +675,7 @@ void runVideo(void)
 			//getMeta();
 		}
 	while (doQuitVideo==false);
-	mainApp->CTK_setPage(MAINPAGE);
+	mainApp->CTK_setPage(FILMPAGE);
 	mainApp->runEventLoop=true;
 	mainApp->CTK_clearScreen();
 	mainApp->CTK_updateScreen(mainApp,NULL);
