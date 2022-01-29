@@ -87,13 +87,33 @@ void makeMoviePausePage(void)
 	int						btnnumy=1;
 	int						btncnt=2;
 
+	int						gw=ma.maxCols/8;
+	int						gh=gw/(fbInfo->charHeight/fbInfo->charWidth);
+
+	if(useFBImages==false)
+		gw=10;
+
+
 	movieControlsSY=ma.maxRows-4;
 
+/*
+	btnnumx=1;
+	for(int j=0;j<CONTROLCNT;j++)
+		{
+			if(useFBImages==true)
+				gadget=mainApp->CTK_addNewFBImage(mainApp->utils->CTK_getGadgetPos(1,mainApp->maxCols,CONTROLCNT,4,btnnumx),controlsSY,4,4,musicPlayerButtons[j][int(useFBImages)]);
+			else
+				gadget=mainApp->CTK_addNewButton(mainApp->utils->CTK_getGadgetPos(1,mainApp->maxCols,CONTROLCNT,10,btnnumx),controlsSY,10,1,musicPlayerButtons[j][int(useFBImages)]);
+			gadget->CTK_setSelectCB(controlsCB,(void*)btnnumx++);
+		}
+
+*/
 	btnnumx=0;
 	for(int j=0;j<VIDEONOMORE;j++)
 		{
 			if(useFBImages==true)
-				gadget=ma.CTK_addNewFBImage(ma.utils->CTK_getGadgetPos(1,ma.maxCols,VIDEONOMORE,4,btnnumx),movieControlsSY,4,4,moviePlayerButtons[j][int(useFBImages)]);
+				//gadget=ma.CTK_addNewFBImage(ma.utils->CTK_getGadgetPos(1,ma.maxCols,VIDEONOMORE,4,btnnumx),movieControlsSY,4,4,moviePlayerButtons[j][int(useFBImages)]);
+				  gadget=ma.CTK_addNewFBImage(ma.utils->CTK_getGadgetPos(1,ma.maxCols,VIDEONOMORE,4,btnnumx),movieControlsSY,4,4,moviePlayerButtons[j][int(useFBImages)]);
 			else
 				gadget=ma.CTK_addNewButton(ma.utils->CTK_getGadgetPos(1,ma.maxCols,VIDEONOMORE,10,btnnumx+1),movieControlsSY,10,1,moviePlayerButtons[j][int(useFBImages)]);
 if(btnnumx==0)
