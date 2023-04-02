@@ -27,7 +27,10 @@ Frame Buffer Media Player
  -h, -?, --help
 	Print this help
 
-Report bugs to keithdhedger@gmail.com
+BUGS etc.
+kdhedger68713@gmail.com
 
 Music player pretty much done.<br>
 Video player to do.
+
+Development is TEMPORARILY stalled.
